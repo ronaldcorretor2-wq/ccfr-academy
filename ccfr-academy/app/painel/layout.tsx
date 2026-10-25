@@ -11,6 +11,7 @@ export default async function PainelLayout({ children }: { children: ReactNode }
         <div className="logo">CCFR Academy</div>
         {member && <p className="m" style={{ marginBottom: 16 }}>{member.orgName}</p>}
         <Link href="/painel">Início</Link>
+        <Link href="/painel/trilhas">Trilhas</Link>
         <Link href="/painel/certificados">Certificados</Link>
         {isStaff && <Link href="/painel/admin">Administração</Link>}
         <form action={signOut} style={{ marginTop: 'auto' }}><button className="b2" type="submit">Sair</button></form>

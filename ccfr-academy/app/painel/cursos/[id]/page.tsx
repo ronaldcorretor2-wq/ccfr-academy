@@ -1,16 +1,18 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getCtx } from '@/lib/ctx';
-import { loadLearning } from '@/lib/data';
-import { enroll, issueCertificate } from '../../actions';
+import { loadLearning, prerequisiteFor } from '@/lib/data';
+import { enroll, issueCertificate, toggleFavorite } from '../../actions';
 
 export default async function Curso({ params, searchParams }: { params: { id: string }; searchParams: { erro?: string } }) {
-  const { supabase, user, member } = await getCtx();
+  const { supabase, user, member, isStaff } = await getCtx();
   const { courses, modules, byCourse, done } = await loadLearning(supabase, user.id);
   const course = courses.find((c) => c.id === params.id);
   if (!course) notFound();
+  const lock = isStaff ? null : await prerequisiteFor(supabase, params.id, byCourse, done, courses);
   const { data: enr } = await supabase.from('enrollments').select('course_id').eq('course_id', params.id).eq('user_id', user.id).maybeSingle();
   const { data: cert } = await supabase.from('certificates').select('id').eq('course_id', params.id).eq('user_id', user.id).maybeSingle();
+  const { data: fav } = await supabase.from('favorites').select('course_id').eq('course_id', params.id).eq('user_id', user.id).maybeSingle();
   const lessons = byCourse[params.id] ?? [];
   const first = lessons.find((l) => !done.has(l.id)) ?? lessons[0];
   const finished = lessons.length > 0 && lessons.every((l) => done.has(l.id));
@@ -23,11 +25,20 @@ export default async function Curso({ params, searchParams }: { params: { id: st
         <p className="m">{course.description}</p>
       </div>
       {searchParams.erro && <div className="erro" role="alert">{searchParams.erro}</div>}
-      {first && (enr || !member ? (
-        <Link className="btn" href={`/painel/aula/${first.id}`}>{lessons.some((l) => done.has(l.id)) ? 'Continuar curso' : 'Começar curso'}</Link>
-      ) : (
-        <form action={enroll}><input type="hidden" name="course_id" value={params.id} /><button className="btn" type="submit">Matricular-se</button></form>
-      ))}
+      {lock && <div className="erro" role="status">Este curso faz parte de uma trilha. Conclua antes: {lock}.</div>}
+      <div className="row">
+        {first && !lock && (enr || !member ? (
+          <Link className="btn" href={`/painel/aula/${first.id}`}>{lessons.some((l) => done.has(l.id)) ? 'Continuar curso' : 'Começar curso'}</Link>
+        ) : (
+          <form action={enroll}><input type="hidden" name="course_id" value={params.id} /><button className="btn" type="submit">Matricular-se</button></form>
+        ))}
+        {member && (
+          <form action={toggleFavorite}>
+            <input type="hidden" name="course_id" value={params.id} />
+            <button className="b2" type="submit">{fav ? 'Remover dos favoritos' : 'Favoritar'}</button>
+          </form>
+        )}
+      </div>
       {finished && (
         <section className="pn">
           <h2>Você concluiu este curso</h2>

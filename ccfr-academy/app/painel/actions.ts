@@ -287,3 +287,105 @@ export async function issueCertificate(fd: FormData) {
   if (error || !data) back(`/painel/cursos/${courseId}`, 'erro', 'Ainda não é possível emitir o certificado. Conclua todas as aulas do curso.');
   redirect(`/painel/certificados/${data}`);
 }
+
+// ---------- Anotações, favoritos, materiais, trilhas ----------
+
+export async function saveNote(fd: FormData) {
+  const { supabase, user, member } = await getCtx();
+  const lessonId = txt(fd, 'lesson_id');
+  if (!member) redirect('/painel');
+  const { error } = await supabase.from('lesson_notes').upsert({
+    org_id: member.orgId, lesson_id: lessonId, user_id: user.id, content: String(fd.get('content') ?? '').slice(0, 5000), updated_at: new Date().toISOString(),
+  });
+  if (error) back(`/painel/aula/${lessonId}`, 'erro', 'Não foi possível salvar as anotações.');
+  back(`/painel/aula/${lessonId}`, 'ok', 'Anotações salvas.');
+}
+
+export async function toggleFavorite(fd: FormData) {
+  const { supabase, user, member } = await getCtx();
+  const courseId = txt(fd, 'course_id');
+  if (!member) redirect('/painel');
+  const { data } = await supabase.from('favorites').select('course_id').eq('course_id', courseId).eq('user_id', user.id).maybeSingle();
+  if (data) await supabase.from('favorites').delete().eq('course_id', courseId).eq('user_id', user.id);
+  else await supabase.from('favorites').insert({ org_id: member.orgId, course_id: courseId, user_id: user.id });
+  revalidatePath('/painel', 'layout');
+  redirect(`/painel/cursos/${courseId}`);
+}
+
+export async function addResource(fd: FormData) {
+  const { supabase, member } = await requireStaff();
+  const lessonId = txt(fd, 'lesson_id');
+  const path = `/painel/admin/aulas/${lessonId}`;
+  const url = txt(fd, 'url');
+  if (!/^https?:\/\//i.test(url)) back(path, 'erro', 'O endereço precisa começar com http:// ou https://.');
+  const kind = ['link', 'pdf', 'audio', 'outro'].includes(txt(fd, 'kind')) ? txt(fd, 'kind') : 'link';
+  const { data: l } = await supabase.from('lessons').select('course_id').eq('id', lessonId).single();
+  const { count } = await supabase.from('lesson_resources').select('id', { count: 'exact', head: true }).eq('lesson_id', lessonId);
+  const { error } = await supabase.from('lesson_resources').insert({
+    org_id: member.orgId, course_id: l?.course_id, lesson_id: lessonId, title: txt(fd, 'title'), url, kind, position: (count ?? 0) + 1,
+  });
+  if (error) back(path, 'erro', 'Não foi possível adicionar o material.');
+  redirect(path);
+}
+
+export async function deleteResource(fd: FormData) {
+  const { supabase } = await requireStaff();
+  await supabase.from('lesson_resources').delete().eq('id', txt(fd, 'id'));
+  redirect(`/painel/admin/aulas/${txt(fd, 'lesson_id')}`);
+}
+
+export async function createPath(fd: FormData) {
+  const { supabase, member } = await requireStaff();
+  const { data, error } = await supabase.from('learning_paths').insert({ org_id: member.orgId, title: txt(fd, 'title') }).select('id').single();
+  if (error || !data) back('/painel/admin/trilhas', 'erro', 'Não foi possível criar a trilha.');
+  redirect(`/painel/admin/trilhas/${data!.id}`);
+}
+
+export async function updatePath(fd: FormData) {
+  const { supabase } = await requireStaff();
+  const id = txt(fd, 'id');
+  const { error } = await supabase.from('learning_paths').update({ title: txt(fd, 'title'), description: txt(fd, 'description') }).eq('id', id);
+  if (error) back(`/painel/admin/trilhas/${id}`, 'erro', 'Não foi possível salvar a trilha.');
+  back(`/painel/admin/trilhas/${id}`, 'ok', 'Trilha salva.');
+}
+
+export async function setPathStatus(fd: FormData) {
+  const { supabase } = await requireStaff();
+  const id = txt(fd, 'id');
+  const status = txt(fd, 'status');
+  if (status === 'published') {
+    const { count } = await supabase.from('learning_path_courses').select('id', { count: 'exact', head: true }).eq('path_id', id);
+    if (!count) back(`/painel/admin/trilhas/${id}`, 'erro', 'Para publicar, adicione pelo menos um curso à trilha.');
+  }
+  await supabase.from('learning_paths').update({ status }).eq('id', id);
+  revalidatePath('/painel', 'layout');
+  back(`/painel/admin/trilhas/${id}`, 'ok', status === 'published' ? 'Trilha publicada.' : 'Trilha voltou para rascunho.');
+}
+
+export async function deletePath(fd: FormData) {
+  const { supabase } = await requireStaff();
+  await supabase.from('learning_paths').delete().eq('id', txt(fd, 'id'));
+  redirect('/painel/admin/trilhas');
+}
+
+export async function addPathCourse(fd: FormData) {
+  const { supabase, member } = await requireStaff();
+  const pathId = txt(fd, 'path_id');
+  const { count } = await supabase.from('learning_path_courses').select('id', { count: 'exact', head: true }).eq('path_id', pathId);
+  const { error } = await supabase.from('learning_path_courses').insert({ org_id: member.orgId, path_id: pathId, course_id: txt(fd, 'course_id'), position: (count ?? 0) + 1 });
+  if (error) back(`/painel/admin/trilhas/${pathId}`, 'erro', 'Não foi possível adicionar o curso (ele pode já estar na trilha).');
+  redirect(`/painel/admin/trilhas/${pathId}`);
+}
+
+export async function removePathCourse(fd: FormData) {
+  const { supabase } = await requireStaff();
+  await supabase.from('learning_path_courses').delete().eq('id', txt(fd, 'id'));
+  redirect(`/painel/admin/trilhas/${txt(fd, 'path_id')}`);
+}
+
+export async function movePathCourse(fd: FormData) {
+  const { supabase } = await requireStaff();
+  const pathId = txt(fd, 'path_id');
+  await swap(supabase, 'learning_path_courses', 'path_id', pathId, txt(fd, 'id'), txt(fd, 'dir'));
+  redirect(`/painel/admin/trilhas/${pathId}`);
+}

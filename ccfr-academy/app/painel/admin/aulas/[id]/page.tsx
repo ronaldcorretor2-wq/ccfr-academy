@@ -2,13 +2,15 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { requireStaff } from '@/lib/ctx';
 import ConfirmButton from '@/components/ConfirmButton';
-import { addQuestion, createAssessment, deleteAssessment, deleteQuestion, updateLesson } from '../../../actions';
+import { addQuestion, addResource, createAssessment, deleteAssessment, deleteQuestion, deleteResource, updateLesson } from '../../../actions';
 
 export default async function EditarAula({ params, searchParams }: { params: { id: string }; searchParams: { erro?: string } }) {
   const { supabase } = await requireStaff();
   const { data: a } = await supabase.from('lessons').select('id,course_id,title,video_url,content').eq('id', params.id).maybeSingle();
   if (!a) notFound();
   const { data: quiz } = await supabase.from('assessments').select('id,title,pass_score').eq('lesson_id', a.id).maybeSingle();
+  const { data: rs } = await supabase.from('lesson_resources').select('id,title,url').eq('lesson_id', a.id).order('position');
+  const resources: any[] = rs ?? [];
   let questions: any[] = [];
   const keys: Record<string, number> = {};
   if (quiz) {
@@ -85,6 +87,31 @@ export default async function EditarAula({ params, searchParams }: { params: { i
             </form>
           </>
         )}
+      </section>
+
+      <section className="pn">
+        <h2>Materiais complementares</h2>
+        <p className="m">Cole o link do PDF, do áudio ou do site (por exemplo, de uma pasta compartilhada). O envio direto de arquivos fica para uma próxima etapa.</p>
+        {resources.map((r: any) => (
+          <div className="li" key={r.id}>
+            <span style={{ flex: 1 }}>{r.title} <span className="m">({r.url})</span></span>
+            <form action={deleteResource}>
+              <input type="hidden" name="id" value={r.id} /><input type="hidden" name="lesson_id" value={a.id} />
+              <ConfirmButton message="Excluir este material?">Excluir</ConfirmButton>
+            </form>
+          </div>
+        ))}
+        <form className="pn" action={addResource} style={{ background: '#111' }}>
+          <input type="hidden" name="lesson_id" value={a.id} />
+          <label>Título<input className="in" name="title" required /></label>
+          <label>Endereço (link)<input className="in" name="url" type="url" required placeholder="https://..." /></label>
+          <label>Tipo
+            <select className="in" name="kind" defaultValue="link">
+              <option value="link">Link</option><option value="pdf">PDF</option><option value="audio">Áudio</option><option value="outro">Outro</option>
+            </select>
+          </label>
+          <button className="btn" type="submit">Adicionar material</button>
+        </form>
       </section>
     </>
   );

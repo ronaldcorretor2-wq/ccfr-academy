@@ -31,3 +31,21 @@ export function youtubeId(u: string | null) {
   const m = u.match(/(?:youtu\.be\/|v=|embed\/)([\w-]{11})/);
   return m ? m[1] : null;
 }
+
+// Pré-requisito: numa trilha publicada, um curso só abre depois de concluir os anteriores.
+export async function prerequisiteFor(supabase: any, courseId: string, byCourse: Record<string, any[]>, done: Set<string>, courses: any[]): Promise<string | null> {
+  const { data } = await supabase
+    .from('learning_path_courses')
+    .select('path_id,course_id,position,learning_paths!inner(status)')
+    .eq('learning_paths.status', 'published');
+  const rows: any[] = data ?? [];
+  for (const r of rows.filter((x) => x.course_id === courseId)) {
+    for (const p of rows.filter((x) => x.path_id === r.path_id && x.position < r.position)) {
+      const prev = courses.find((c: any) => c.id === p.course_id);
+      if (!prev) continue;
+      const ls = byCourse[p.course_id] ?? [];
+      if (!(ls.length > 0 && ls.every((l: any) => done.has(l.id)))) return prev.title as string;
+    }
+  }
+  return null;
+}

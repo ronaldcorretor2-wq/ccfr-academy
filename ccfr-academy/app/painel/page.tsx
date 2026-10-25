@@ -37,6 +37,9 @@ export default async function Painel({ searchParams }: { searchParams: { erro?: 
   }
 
   const { courses, byCourse, done, last } = await loadLearning(supabase, user.id);
+  const { data: fv } = await supabase.from('favorites').select('course_id').eq('user_id', user.id);
+  const favs = new Set<string>(((fv ?? []) as any[]).map((x: any) => x.course_id as string));
+  const ordered = [...courses].sort((a, b) => Number(favs.has(b.id)) - Number(favs.has(a.id)));
   const pct = (id: string) => {
     const ls = byCourse[id] ?? [];
     return ls.length ? Math.round((ls.filter((l) => done.has(l.id)).length / ls.length) * 100) : 0;
@@ -67,9 +70,10 @@ export default async function Painel({ searchParams }: { searchParams: { erro?: 
       <section>
         <h2>Cursos</h2>
         <div className="g">
-          {courses.map((c) => (
+          {ordered.map((c) => (
             <Link key={c.id} href={`/painel/cursos/${c.id}`} className="pn" style={{ textDecoration: 'none' }}>
               <h3>{c.title}</h3>
+              {favs.has(c.id) && <span className="tag" style={{ alignSelf: 'flex-start' }}>Favorito</span>}
               {c.status !== 'published' && <span className="tag" style={{ alignSelf: 'flex-start' }}>Rascunho (só equipe vê)</span>}
               <p className="m">{c.description}</p>
               <div className="bar"><i style={{ width: `${pct(c.id)}%` }} /></div>

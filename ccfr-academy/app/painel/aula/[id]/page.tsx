@@ -1,17 +1,21 @@
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { getCtx } from '@/lib/ctx';
-import { loadLearning, youtubeId } from '@/lib/data';
+import { loadLearning, prerequisiteFor, youtubeId } from '@/lib/data';
 import YouTubePlayer from '@/components/YouTubePlayer';
-import { completeLesson, savePosition, takeAssessment } from '../../actions';
+import { completeLesson, saveNote, savePosition, takeAssessment } from '../../actions';
 
 type SP = { erro?: string; ok?: string; nota?: string; aprovado?: string; erradas?: string };
 
 export default async function Aula({ params, searchParams }: { params: { id: string }; searchParams: SP }) {
-  const { supabase, user } = await getCtx();
+  const { supabase, user, isStaff } = await getCtx();
   const { data: lesson } = await supabase.from('lessons').select('id,course_id,title,video_url,content').eq('id', params.id).maybeSingle();
   if (!lesson) notFound();
   const { courses, byCourse, done } = await loadLearning(supabase, user.id);
+  if (!isStaff) {
+    const lock = await prerequisiteFor(supabase, lesson.course_id, byCourse, done, courses);
+    if (lock) redirect(`/painel/cursos/${lesson.course_id}?erro=${encodeURIComponent('Conclua antes o curso: ' + lock)}`);
+  }
   const list = byCourse[lesson.course_id] ?? [];
   const i = list.findIndex((l) => l.id === lesson.id);
   const prev = list[i - 1];
@@ -32,6 +36,12 @@ export default async function Aula({ params, searchParams }: { params: { id: str
     questions = q.data ?? [];
     attempts = a.data ?? [];
   }
+  const [{ data: rs }, { data: nt }] = await Promise.all([
+    supabase.from('lesson_resources').select('id,title,url,kind').eq('lesson_id', lesson.id).order('position'),
+    supabase.from('lesson_notes').select('content').eq('lesson_id', lesson.id).eq('user_id', user.id).maybeSingle(),
+  ]);
+  const resources: any[] = rs ?? [];
+  const kinds: Record<string, string> = { link: 'Link', pdf: 'PDF', audio: 'Áudio', outro: 'Outro' };
   const hasQuiz = !!quiz && questions.length > 0;
   const passed = attempts.some((x: any) => x.passed);
   const canComplete = !hasQuiz || passed;
@@ -90,6 +100,24 @@ export default async function Aula({ params, searchParams }: { params: { id: str
           )}
         </form>
       )}
+
+      {resources.length > 0 && (
+        <section className="pn">
+          <h2>Materiais complementares</h2>
+          {resources.map((r: any) => (
+            <div className="li" key={r.id}>
+              <a href={r.url} target="_blank" rel="noopener noreferrer">{r.title}</a>
+              <span className="tag">{kinds[r.kind] ?? 'Link'}</span>
+            </div>
+          ))}
+        </section>
+      )}
+      <form className="pn" action={saveNote}>
+        <input type="hidden" name="lesson_id" value={lesson.id} />
+        <h2>Minhas anotações</h2>
+        <textarea className="in" name="content" defaultValue={nt?.content ?? ''} maxLength={5000} aria-label="Minhas anotações desta aula" />
+        <button className="b2" type="submit" style={{ alignSelf: 'flex-start' }}>Salvar anotações</button>
+      </form>
 
       <div className="row">
         {prev && <Link className="b2" href={`/painel/aula/${prev.id}`}>Aula anterior</Link>}

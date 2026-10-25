@@ -11,6 +11,7 @@ export default async function Admin({ searchParams }: { searchParams: { erro?: s
     <>
       <h1>Administração</h1>
       {member.role === 'admin' && <div className="row"><Link className="b2" href="/painel/admin/pessoas">Pessoas: alunos e professores</Link></div>}
+      <div className="row"><Link className="b2" href="/painel/admin/trilhas">Trilhas de formação</Link><Link className="b2" href="/painel/admin/relatorios">Relatórios</Link></div>
       {searchParams.erro && <div className="erro" role="alert">{searchParams.erro}</div>}
       <form className="pn" action={createCourse}>
         <h2>Novo curso</h2>
