@@ -25,3 +25,9 @@ export function embedUrl(u: string | null) {
   const m = u.match(/(?:youtu\.be\/|v=|embed\/)([\w-]{11})/);
   return m ? `https://www.youtube.com/embed/${m[1]}` : null;
 }
+
+export function youtubeId(u: string | null) {
+  if (!u) return null;
+  const m = u.match(/(?:youtu\.be\/|v=|embed\/)([\w-]{11})/);
+  return m ? m[1] : null;
+}

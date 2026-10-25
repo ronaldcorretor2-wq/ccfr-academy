@@ -5,3 +5,4 @@
 - Estado: Fase 2/3/4 em versão mínima (ver LEIA-ME.md). Próximos: editar/reordenar aulas, retomar vídeo, avaliações, certificados, trilhas, painel mestre, auditoria, testes de isolamento.
 - Regras: papel e organização vêm do banco (RLS), nunca do navegador; org_id nas ações é derivado da sessão no servidor.
 - Avaliações (migração 002): questionário por aula, correção no banco (função submit_attempt); gabarito em tabela só da equipe; aula com avaliação só conclui após aprovação.
+- Retomar vídeo (YouTube IFrame API, posição salva a cada 10 s) e certificados (migração 003: emissão por função no banco, código verificável em /verificar/CÓDIGO).

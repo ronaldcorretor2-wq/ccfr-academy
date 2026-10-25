@@ -269,3 +269,21 @@ export async function takeAssessment(fd: FormData) {
   const wrong = (res.results as any[]).map((r: any, i: number) => (r.correct ? 0 : i + 1)).filter((n: number) => n > 0).join(', ');
   redirect(`/painel/aula/${lessonId}?nota=${res.score}&aprovado=${res.passed ? 1 : 0}&erradas=${encodeURIComponent(wrong)}`);
 }
+
+// ---------- Retomar vídeo e certificados ----------
+
+export async function savePosition(lessonId: string, seconds: number) {
+  const { supabase, user, member } = await getCtx();
+  if (!member || !Number.isFinite(seconds) || seconds < 0) return;
+  await supabase.from('lesson_progress').upsert({
+    org_id: member.orgId, lesson_id: lessonId, user_id: user.id, position_seconds: Math.floor(seconds), updated_at: new Date().toISOString(),
+  });
+}
+
+export async function issueCertificate(fd: FormData) {
+  const { supabase } = await getCtx();
+  const courseId = txt(fd, 'course_id');
+  const { data, error } = await supabase.rpc('issue_certificate', { p_course: courseId });
+  if (error || !data) back(`/painel/cursos/${courseId}`, 'erro', 'Ainda não é possível emitir o certificado. Conclua todas as aulas do curso.');
+  redirect(`/painel/certificados/${data}`);
+}

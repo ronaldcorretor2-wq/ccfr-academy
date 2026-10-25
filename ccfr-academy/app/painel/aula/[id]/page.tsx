@@ -1,8 +1,9 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getCtx } from '@/lib/ctx';
-import { embedUrl, loadLearning } from '@/lib/data';
-import { completeLesson, takeAssessment } from '../../actions';
+import { loadLearning, youtubeId } from '@/lib/data';
+import YouTubePlayer from '@/components/YouTubePlayer';
+import { completeLesson, savePosition, takeAssessment } from '../../actions';
 
 type SP = { erro?: string; ok?: string; nota?: string; aprovado?: string; erradas?: string };
 
@@ -16,7 +17,9 @@ export default async function Aula({ params, searchParams }: { params: { id: str
   const prev = list[i - 1];
   const next = list[i + 1];
   const course = courses.find((c) => c.id === lesson.course_id);
-  const embed = embedUrl(lesson.video_url);
+  const vid = youtubeId(lesson.video_url);
+  const { data: pg } = await supabase.from('lesson_progress').select('position_seconds').eq('lesson_id', lesson.id).eq('user_id', user.id).maybeSingle();
+  const startAt = Number(pg?.position_seconds ?? 0);
 
   const { data: quiz } = await supabase.from('assessments').select('id,title,pass_score').eq('lesson_id', lesson.id).maybeSingle();
   let questions: any[] = [];
@@ -41,8 +44,8 @@ export default async function Aula({ params, searchParams }: { params: { id: str
       </div>
       {searchParams.erro && <div className="erro" role="alert">{searchParams.erro}</div>}
       {searchParams.ok && <div className="ok" role="status">{searchParams.ok}</div>}
-      {embed ? (
-        <iframe className="video" src={embed} title={lesson.title} allow="accelerometer; encrypted-media; picture-in-picture" allowFullScreen />
+      {vid ? (
+        <YouTubePlayer videoId={vid} lessonId={lesson.id} start={startAt} save={savePosition} />
       ) : lesson.video_url ? (
         <a className="b2" href={lesson.video_url} target="_blank" rel="noopener noreferrer">Abrir vídeo em outra aba</a>
       ) : (
