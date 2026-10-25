@@ -1,10 +1,19 @@
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 import { getCtx } from '@/lib/ctx';
 import { loadLearning } from '@/lib/data';
 import { createOrg, joinOrg } from './actions';
 
 export default async function Painel({ searchParams }: { searchParams: { erro?: string } }) {
   const { supabase, user, member } = await getCtx();
+
+  if (!member) {
+    const slug = String(user.user_metadata?.church_slug ?? '').trim();
+    if (slug) {
+      const { error } = await supabase.rpc('join_organization', { p_slug: slug });
+      if (!error) redirect('/painel');
+    }
+  }
 
   if (!member) {
     return (

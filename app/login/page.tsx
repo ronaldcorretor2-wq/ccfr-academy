@@ -16,6 +16,7 @@ export default function Login({ searchParams }: { searchParams: { erro?: string;
         <h2>Criar conta</h2>
         <label>Nome completo<input className="in" name="full_name" required /></label>
         <label>E-mail<input className="in" name="email" type="email" required autoComplete="email" /></label>
+        <label>Endereço da sua igreja (alunos e professores: peça à sua igreja)<input className="in" name="church_slug" placeholder="ex.: ccfr" /></label>
         <label>Senha (mínimo de 8 caracteres)<input className="in" name="password" type="password" minLength={8} required autoComplete="new-password" /></label>
         <button className="btn" type="submit">Criar conta</button>
       </form>

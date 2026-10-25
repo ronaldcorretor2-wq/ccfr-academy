@@ -19,7 +19,7 @@ export async function signUp(fd: FormData) {
   const { data, error } = await createClient().auth.signUp({
     email: String(fd.get('email') ?? '').trim(),
     password,
-    options: { data: { full_name: String(fd.get('full_name') ?? '').trim() } },
+    options: { data: { full_name: String(fd.get('full_name') ?? '').trim(), church_slug: String(fd.get('church_slug') ?? '').trim().toLowerCase() } },
   });
   if (error) go('erro', 'Não foi possível criar a conta. Confira os dados e tente de novo.');
   if (data.session) redirect('/painel');

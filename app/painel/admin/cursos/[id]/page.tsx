@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { requireStaff } from '@/lib/ctx';
 import ConfirmButton from '@/components/ConfirmButton';
-import { addLesson, addModule, deleteCourse, deleteLesson, deleteModule, setStatus, updateCourse } from '../../../actions';
+import { addLesson, addModule, deleteCourse, deleteLesson, deleteModule, moveLesson, moveModule, setStatus, updateCourse } from '../../../actions';
 
 export default async function CursoAdmin({ params, searchParams }: { params: { id: string }; searchParams: { erro?: string; ok?: string } }) {
   const { supabase } = await requireStaff();
@@ -50,6 +50,7 @@ export default async function CursoAdmin({ params, searchParams }: { params: { i
           <div key={mod.id} className="pn" style={{ background: '#111' }}>
             <div className="row" style={{ justifyContent: 'space-between' }}>
               <h3>{mod.title}</h3>
+              <Mover action={moveModule} id={mod.id} courseId={id} />
               <form action={deleteModule}>
                 <input type="hidden" name="id" value={mod.id} /><input type="hidden" name="course_id" value={id} />
                 <ConfirmButton message="Excluir este módulo e todas as suas aulas?">Excluir módulo</ConfirmButton>
@@ -57,7 +58,9 @@ export default async function CursoAdmin({ params, searchParams }: { params: { i
             </div>
             {lessons.filter((x) => x.module_id === mod.id).map((x) => (
               <div className="li" key={x.id}>
-                <span>{x.title}</span>
+                <span style={{ flex: 1 }}>{x.title}</span>
+                <Mover action={moveLesson} id={x.id} courseId={id} moduleId={mod.id} />
+                <Link className="b2" href={`/painel/admin/aulas/${x.id}`}>Editar</Link>
                 <form action={deleteLesson}>
                   <input type="hidden" name="id" value={x.id} /><input type="hidden" name="course_id" value={id} />
                   <ConfirmButton message="Excluir esta aula?">Excluir</ConfirmButton>
@@ -107,5 +110,21 @@ export default async function CursoAdmin({ params, searchParams }: { params: { i
         {!enrolled.length && <p className="m">Nenhum aluno matriculado ainda.</p>}
       </section>
     </>
+  );
+}
+
+function Mover({ action, id, courseId, moduleId }: { action: (fd: FormData) => Promise<void>; id: string; courseId: string; moduleId?: string }) {
+  return (
+    <span className="row" style={{ gap: 6 }}>
+      {(['up', 'down'] as const).map((d) => (
+        <form key={d} action={action}>
+          <input type="hidden" name="id" value={id} />
+          <input type="hidden" name="course_id" value={courseId} />
+          {moduleId && <input type="hidden" name="module_id" value={moduleId} />}
+          <input type="hidden" name="dir" value={d} />
+          <button className="b2" type="submit">{d === 'up' ? 'Subir' : 'Descer'}</button>
+        </form>
+      ))}
+    </span>
   );
 }

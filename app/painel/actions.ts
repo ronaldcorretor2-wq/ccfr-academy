@@ -126,3 +126,68 @@ export async function deleteLesson(fd: FormData) {
   await supabase.from('lessons').delete().eq('id', txt(fd, 'id'));
   redirect(`/painel/admin/cursos/${courseId}`);
 }
+
+// ---------- Ordem das aulas, edição de aula e pessoas ----------
+
+async function renumber(supabase: any, table: string, col: string, val: string): Promise<string[]> {
+  const { data } = await supabase.from(table).select('id').eq(col, val).order('position').order('id');
+  const rows: any[] = data ?? [];
+  for (let i = 0; i < rows.length; i++) await supabase.from(table).update({ position: i + 1 }).eq('id', rows[i].id);
+  return rows.map((r: any) => r.id as string);
+}
+
+async function swap(supabase: any, table: string, col: string, val: string, id: string, dir: string) {
+  const ids = await renumber(supabase, table, col, val);
+  const i = ids.indexOf(id);
+  const j = dir === 'up' ? i - 1 : i + 1;
+  if (i < 0 || j < 0 || j >= ids.length) return;
+  await supabase.from(table).update({ position: j + 1 }).eq('id', ids[i]);
+  await supabase.from(table).update({ position: i + 1 }).eq('id', ids[j]);
+}
+
+export async function moveModule(fd: FormData) {
+  const { supabase } = await requireStaff();
+  const courseId = txt(fd, 'course_id');
+  await swap(supabase, 'course_modules', 'course_id', courseId, txt(fd, 'id'), txt(fd, 'dir'));
+  redirect(`/painel/admin/cursos/${courseId}`);
+}
+
+export async function moveLesson(fd: FormData) {
+  const { supabase } = await requireStaff();
+  const courseId = txt(fd, 'course_id');
+  await swap(supabase, 'lessons', 'module_id', txt(fd, 'module_id'), txt(fd, 'id'), txt(fd, 'dir'));
+  redirect(`/painel/admin/cursos/${courseId}`);
+}
+
+export async function updateLesson(fd: FormData) {
+  const { supabase } = await requireStaff();
+  const courseId = txt(fd, 'course_id');
+  const { error } = await supabase.from('lessons').update({
+    title: txt(fd, 'title'), video_url: txt(fd, 'video_url') || null, content: txt(fd, 'content'),
+  }).eq('id', txt(fd, 'id'));
+  if (error) back(`/painel/admin/aulas/${txt(fd, 'id')}`, 'erro', 'Não foi possível salvar a aula.');
+  back(`/painel/admin/cursos/${courseId}`, 'ok', 'Aula atualizada.');
+}
+
+export async function setRole(fd: FormData) {
+  const { supabase, member, user } = await requireStaff();
+  const path = '/painel/admin/pessoas';
+  const userId = txt(fd, 'user_id');
+  const role = txt(fd, 'role');
+  if (member.role !== 'admin') redirect('/painel/admin');
+  if (!['admin', 'teacher', 'student'].includes(role)) back(path, 'erro', 'Papel inválido.');
+  if (userId === user.id) back(path, 'erro', 'Você não pode mudar o seu próprio papel.');
+  const { error } = await supabase.from('organization_members').update({ role }).eq('org_id', member.orgId).eq('user_id', userId);
+  if (error) back(path, 'erro', 'Não foi possível alterar o papel.');
+  back(path, 'ok', 'Papel alterado.');
+}
+
+export async function removeMember(fd: FormData) {
+  const { supabase, member, user } = await requireStaff();
+  const path = '/painel/admin/pessoas';
+  const userId = txt(fd, 'user_id');
+  if (member.role !== 'admin') redirect('/painel/admin');
+  if (userId === user.id) back(path, 'erro', 'Você não pode remover a si mesmo.');
+  await supabase.from('organization_members').delete().eq('org_id', member.orgId).eq('user_id', userId);
+  back(path, 'ok', 'Pessoa removida da igreja.');
+}

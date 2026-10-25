@@ -3,13 +3,14 @@ import { requireStaff } from '@/lib/ctx';
 import { createCourse } from '../actions';
 
 export default async function Admin({ searchParams }: { searchParams: { erro?: string } }) {
-  const { supabase } = await requireStaff();
+  const { supabase, member } = await requireStaff();
   const { data } = await supabase.from('courses').select('id,title,status').order('created_at');
   const courses: any[] = data ?? [];
   const label: Record<string, string> = { draft: 'Rascunho', published: 'Publicado', archived: 'Arquivado' };
   return (
     <>
       <h1>Administração</h1>
+      {member.role === 'admin' && <div className="row"><Link className="b2" href="/painel/admin/pessoas">Pessoas: alunos e professores</Link></div>}
       {searchParams.erro && <div className="erro" role="alert">{searchParams.erro}</div>}
       <form className="pn" action={createCourse}>
         <h2>Novo curso</h2>
