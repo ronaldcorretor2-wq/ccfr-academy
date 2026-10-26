@@ -10,3 +10,4 @@
 - Segurança (migração 005): só o painel mestre cria igrejas (platform_admins), plano e limite de alunos, auditoria por gatilhos. Testes de isolamento: 006 (select * from run_isolation_tests()). Pendente: upload de arquivos (Storage), visual final, domínios.
 - Envio de PDF/áudio e logotipo via Supabase Storage (migração 007, bucket privado materiais, caminho começa pelo id da igreja), visual final: fontes Schibsted/Hanken, tema claro/escuro, capas geométricas provisórias, hero no dashboard. Pendente: fotos reais das capas, domínios próprios, subdomínios.
 - Recuperação de senha (/recuperar, /auth/callback), avisos da igreja, catálogo público opcional /c/ENDEREÇO (migração 008). LEIA-ME.md atualizado. Pendente: fotos de capa, subdomínios, notificações.
+- Notificações dentro do site (migração 009): gatilhos no banco para novo aviso, novo curso publicado e certificado.

@@ -473,3 +473,19 @@ export async function togglePublicCatalog(fd: FormData) {
   if (error) back('/painel/admin/configuracoes', 'erro', 'Não foi possível alterar o catálogo público.');
   back('/painel/admin/configuracoes', 'ok', 'Catálogo público atualizado.');
 }
+
+// ---------- Notificações ----------
+
+export async function markAllRead() {
+  const { supabase, user } = await getCtx();
+  await supabase.from('notifications').update({ read_at: new Date().toISOString() }).eq('user_id', user.id).is('read_at', null);
+  revalidatePath('/painel', 'layout');
+  redirect('/painel/notificacoes');
+}
+
+export async function markRead(fd: FormData) {
+  const { supabase, user } = await getCtx();
+  await supabase.from('notifications').update({ read_at: new Date().toISOString() }).eq('id', txt(fd, 'id')).eq('user_id', user.id);
+  revalidatePath('/painel', 'layout');
+  redirect('/painel/notificacoes');
+}
