@@ -1,15 +1,16 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { requireStaff } from '@/lib/ctx';
+import UploadResource from '@/components/UploadResource';
 import ConfirmButton from '@/components/ConfirmButton';
-import { addQuestion, addResource, createAssessment, deleteAssessment, deleteQuestion, deleteResource, updateLesson } from '../../../actions';
+import { addQuestion, addResource, createAssessment, deleteAssessment, deleteQuestion, deleteResource, registerUpload, updateLesson } from '../../../actions';
 
 export default async function EditarAula({ params, searchParams }: { params: { id: string }; searchParams: { erro?: string } }) {
-  const { supabase } = await requireStaff();
+  const { supabase, member } = await requireStaff();
   const { data: a } = await supabase.from('lessons').select('id,course_id,title,video_url,content').eq('id', params.id).maybeSingle();
   if (!a) notFound();
   const { data: quiz } = await supabase.from('assessments').select('id,title,pass_score').eq('lesson_id', a.id).maybeSingle();
-  const { data: rs } = await supabase.from('lesson_resources').select('id,title,url').eq('lesson_id', a.id).order('position');
+  const { data: rs } = await supabase.from('lesson_resources').select('id,title,url,storage_path').eq('lesson_id', a.id).order('position');
   const resources: any[] = rs ?? [];
   let questions: any[] = [];
   const keys: Record<string, number> = {};
@@ -40,7 +41,7 @@ export default async function EditarAula({ params, searchParams }: { params: { i
       <section className="pn">
         <h2>Avaliação da aula</h2>
         {!quiz ? (
-          <form className="pn" action={createAssessment} style={{ background: '#111' }}>
+          <form className="pn" action={createAssessment} style={{ background: 'var(--soft)' }}>
             <input type="hidden" name="lesson_id" value={a.id} />
             <p className="m">Esta aula ainda não tem avaliação. Quando houver, o aluno só conclui a aula depois de ser aprovado.</p>
             <label>Título<input className="in" name="title" defaultValue="Questionário" /></label>
@@ -70,7 +71,7 @@ export default async function EditarAula({ params, searchParams }: { params: { i
                 </form>
               </div>
             ))}
-            <form className="pn" action={addQuestion} style={{ background: '#111' }}>
+            <form className="pn" action={addQuestion} style={{ background: 'var(--soft)' }}>
               <input type="hidden" name="assessment_id" value={quiz.id} /><input type="hidden" name="lesson_id" value={a.id} />
               <h3>Nova pergunta de múltipla escolha</h3>
               <label>Pergunta<input className="in" name="prompt" required /></label>
@@ -91,17 +92,18 @@ export default async function EditarAula({ params, searchParams }: { params: { i
 
       <section className="pn">
         <h2>Materiais complementares</h2>
-        <p className="m">Cole o link do PDF, do áudio ou do site (por exemplo, de uma pasta compartilhada). O envio direto de arquivos fica para uma próxima etapa.</p>
+        <p className="m">Envie um PDF ou áudio direto daqui, ou cole o link de um material que já esteja na internet.</p>
         {resources.map((r: any) => (
           <div className="li" key={r.id}>
-            <span style={{ flex: 1 }}>{r.title} <span className="m">({r.url})</span></span>
+            <span style={{ flex: 1 }}>{r.title} <span className="m">({r.url ?? 'arquivo enviado'})</span></span>
             <form action={deleteResource}>
               <input type="hidden" name="id" value={r.id} /><input type="hidden" name="lesson_id" value={a.id} />
               <ConfirmButton message="Excluir este material?">Excluir</ConfirmButton>
             </form>
           </div>
         ))}
-        <form className="pn" action={addResource} style={{ background: '#111' }}>
+        <UploadResource lessonId={a.id} orgId={member.orgId} register={registerUpload} />
+        <form className="pn" action={addResource} style={{ background: 'var(--soft)' }}>
           <input type="hidden" name="lesson_id" value={a.id} />
           <label>Título<input className="in" name="title" required /></label>
           <label>Endereço (link)<input className="in" name="url" type="url" required placeholder="https://..." /></label>

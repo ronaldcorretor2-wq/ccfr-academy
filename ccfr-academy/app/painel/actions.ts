@@ -347,6 +347,8 @@ export async function addResource(fd: FormData) {
 
 export async function deleteResource(fd: FormData) {
   const { supabase } = await requireStaff();
+  const { data: old } = await supabase.from('lesson_resources').select('storage_path').eq('id', txt(fd, 'id')).maybeSingle();
+  if (old?.storage_path) await supabase.storage.from('materiais').remove([old.storage_path]);
   await supabase.from('lesson_resources').delete().eq('id', txt(fd, 'id'));
   redirect(`/painel/admin/aulas/${txt(fd, 'lesson_id')}`);
 }
@@ -405,4 +407,44 @@ export async function movePathCourse(fd: FormData) {
   const pathId = txt(fd, 'path_id');
   await swap(supabase, 'learning_path_courses', 'path_id', pathId, txt(fd, 'id'), txt(fd, 'dir'));
   redirect(`/painel/admin/trilhas/${pathId}`);
+}
+
+// ---------- Arquivos enviados e identidade da igreja ----------
+
+export async function registerUpload(lessonId: string, title: string, kind: string, path: string, size: number): Promise<{ ok: boolean; msg?: string }> {
+  const { supabase, member } = await requireStaff();
+  if (!path.startsWith(`${member.orgId}/${lessonId}/`)) return { ok: false, msg: 'Caminho de arquivo inválido.' };
+  const { data: l } = await supabase.from('lessons').select('course_id').eq('id', lessonId).single();
+  const { count } = await supabase.from('lesson_resources').select('id', { count: 'exact', head: true }).eq('lesson_id', lessonId);
+  const { error } = await supabase.from('lesson_resources').insert({
+    org_id: member.orgId, course_id: l?.course_id, lesson_id: lessonId, title: title.trim().slice(0, 160) || 'Material',
+    storage_path: path, size_bytes: Math.max(0, Math.floor(size)), kind: kind === 'pdf' ? 'pdf' : 'audio', position: (count ?? 0) + 1,
+  });
+  if (error) {
+    await supabase.storage.from('materiais').remove([path]);
+    return { ok: false, msg: 'Não foi possível registrar o arquivo.' };
+  }
+  revalidatePath(`/painel/admin/aulas/${lessonId}`);
+  return { ok: true };
+}
+
+export async function saveLogo(path: string): Promise<{ ok: boolean; msg?: string }> {
+  const { supabase, member } = await requireStaff();
+  if (member.role !== 'admin') return { ok: false, msg: 'Só o administrador pode trocar o logotipo.' };
+  if (!path.startsWith(`${member.orgId}/logo/`)) return { ok: false, msg: 'Caminho de arquivo inválido.' };
+  const { error } = await supabase.from('organizations').update({ logo_path: path }).eq('id', member.orgId);
+  if (error) return { ok: false, msg: 'Não foi possível salvar o logotipo.' };
+  revalidatePath('/painel', 'layout');
+  return { ok: true };
+}
+
+export async function updateOrgName(fd: FormData) {
+  const { supabase, member } = await requireStaff();
+  if (member.role !== 'admin') redirect('/painel/admin');
+  const name = txt(fd, 'name');
+  if (name.length < 2) back('/painel/admin/configuracoes', 'erro', 'O nome precisa ter pelo menos 2 letras.');
+  const { error } = await supabase.from('organizations').update({ name }).eq('id', member.orgId);
+  if (error) back('/painel/admin/configuracoes', 'erro', 'Não foi possível salvar o nome.');
+  revalidatePath('/painel', 'layout');
+  back('/painel/admin/configuracoes', 'ok', 'Nome salvo.');
 }

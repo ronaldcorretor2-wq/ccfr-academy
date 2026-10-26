@@ -34,20 +34,20 @@ begin
   perform set_config('request.jwt.claim.sub', ua::text, true);
   set local role authenticated;
   select count(*) into n from courses;
-  names := names || 'Admin A vê só os cursos da própria igreja'; oks := oks || (n = 2);
+  names := array_append(names, 'Admin A vê só os cursos da própria igreja'::text); oks := array_append(oks, (n = 2));
   select count(*) into n from courses where id = cb;
-  names := names || 'Admin A não lê curso da igreja B'; oks := oks || (n = 0);
+  names := array_append(names, 'Admin A não lê curso da igreja B'::text); oks := array_append(oks, (n = 0));
   update courses set title = 'invasao' where id = cb; get diagnostics n = row_count;
-  names := names || 'Admin A não altera curso da igreja B'; oks := oks || (n = 0);
+  names := array_append(names, 'Admin A não altera curso da igreja B'::text); oks := array_append(oks, (n = 0));
   delete from courses where id = cb; get diagnostics n = row_count;
-  names := names || 'Admin A não exclui curso da igreja B'; oks := oks || (n = 0);
+  names := array_append(names, 'Admin A não exclui curso da igreja B'::text); oks := array_append(oks, (n = 0));
   ok := false;
   begin insert into courses (org_id, title) values (ob, 'invasor'); exception when others then ok := true; end;
-  names := names || 'Admin A não cria curso na igreja B'; oks := oks || ok;
+  names := array_append(names, 'Admin A não cria curso na igreja B'::text); oks := array_append(oks, ok);
   select count(*) into n from organization_members where org_id = ob;
-  names := names || 'Admin A não vê as pessoas da igreja B'; oks := oks || (n = 0);
+  names := array_append(names, 'Admin A não vê as pessoas da igreja B'::text); oks := array_append(oks, (n = 0));
   select count(*) into n from lessons where org_id = ob;
-  names := names || 'Admin A não vê aulas da igreja B'; oks := oks || (n = 0);
+  names := array_append(names, 'Admin A não vê aulas da igreja B'::text); oks := array_append(oks, (n = 0));
 
   -- Aluno da igreja A
   reset role;
@@ -55,21 +55,21 @@ begin
   perform set_config('request.jwt.claim.sub', uc::text, true);
   set local role authenticated;
   select count(*) into n from courses where id = ca;
-  names := names || 'Aluno vê curso publicado da própria igreja'; oks := oks || (n = 1);
+  names := array_append(names, 'Aluno vê curso publicado da própria igreja'::text); oks := array_append(oks, (n = 1));
   select count(*) into n from courses where id = cd;
-  names := names || 'Aluno não vê curso em rascunho'; oks := oks || (n = 0);
+  names := array_append(names, 'Aluno não vê curso em rascunho'::text); oks := array_append(oks, (n = 0));
   ok := false;
   begin insert into courses (org_id, title) values (oa, 'x'); exception when others then ok := true; end;
-  names := names || 'Aluno não cria curso'; oks := oks || ok;
+  names := array_append(names, 'Aluno não cria curso'::text); oks := array_append(oks, ok);
   update organization_members set role = 'admin' where user_id = uc; get diagnostics n = row_count;
-  names := names || 'Aluno não se promove a administrador'; oks := oks || (n = 0);
+  names := array_append(names, 'Aluno não se promove a administrador'::text); oks := array_append(oks, (n = 0));
   select count(*) into n from assessment_answers;
-  names := names || 'Aluno não vê o gabarito das avaliações'; oks := oks || (n = 0);
+  names := array_append(names, 'Aluno não vê o gabarito das avaliações'::text); oks := array_append(oks, (n = 0));
   ok := false;
   begin perform create_organization('X', 'teste-iso-x', 'teste-isolamento-a@teste.invalid'); exception when others then ok := true; end;
-  names := names || 'Aluno não cria igreja'; oks := oks || ok;
+  names := array_append(names, 'Aluno não cria igreja'::text); oks := array_append(oks, ok);
   select count(*) into n from audit_logs;
-  names := names || 'Aluno não vê o registro de ações'; oks := oks || (n = 0);
+  names := array_append(names, 'Aluno não vê o registro de ações'::text); oks := array_append(oks, (n = 0));
 
   -- Administrador da igreja B
   reset role;
@@ -77,10 +77,10 @@ begin
   perform set_config('request.jwt.claim.sub', ub::text, true);
   set local role authenticated;
   select count(*) into n from courses where id = ca;
-  names := names || 'Admin B não lê curso da igreja A'; oks := oks || (n = 0);
+  names := array_append(names, 'Admin B não lê curso da igreja A'::text); oks := array_append(oks, (n = 0));
   ok := false;
   begin perform submit_attempt(asa, '{}'::jsonb); exception when others then ok := true; end;
-  names := names || 'Admin B não responde avaliação da igreja A'; oks := oks || ok;
+  names := array_append(names, 'Admin B não responde avaliação da igreja A'::text); oks := array_append(oks, ok);
 
   -- Limpeza
   reset role;

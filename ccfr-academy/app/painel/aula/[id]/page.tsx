@@ -37,10 +37,16 @@ export default async function Aula({ params, searchParams }: { params: { id: str
     attempts = a.data ?? [];
   }
   const [{ data: rs }, { data: nt }] = await Promise.all([
-    supabase.from('lesson_resources').select('id,title,url,kind').eq('lesson_id', lesson.id).order('position'),
+    supabase.from('lesson_resources').select('id,title,url,kind,storage_path').eq('lesson_id', lesson.id).order('position'),
     supabase.from('lesson_notes').select('content').eq('lesson_id', lesson.id).eq('user_id', user.id).maybeSingle(),
   ]);
   const resources: any[] = rs ?? [];
+  const signed: Record<string, string> = {};
+  const paths = resources.filter((r: any) => r.storage_path).map((r: any) => r.storage_path as string);
+  if (paths.length) {
+    const { data: su } = await supabase.storage.from('materiais').createSignedUrls(paths, 3600);
+    for (const x of (su ?? []) as any[]) if (x.path && x.signedUrl) signed[x.path] = x.signedUrl;
+  }
   const kinds: Record<string, string> = { link: 'Link', pdf: 'PDF', audio: 'Áudio', outro: 'Outro' };
   const hasQuiz = !!quiz && questions.length > 0;
   const passed = attempts.some((x: any) => x.passed);
@@ -79,7 +85,7 @@ export default async function Aula({ params, searchParams }: { params: { id: str
             <fieldset key={q.id} style={{ border: 0, padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
               <legend style={{ fontWeight: 700, marginBottom: 6 }}>{qi + 1}. {q.prompt}</legend>
               {(q.options as string[]).map((o: string, oi: number) => (
-                <label key={oi} className="row" style={{ flexDirection: 'row', gap: 8, color: '#F2F2F2', fontSize: 15 }}>
+                <label key={oi} className="row" style={{ flexDirection: 'row', gap: 8, color: 'var(--tx)', fontSize: 15 }}>
                   <input type="radio" name={`q_${q.id}`} value={oi} required />
                   {o}
                 </label>
@@ -105,9 +111,12 @@ export default async function Aula({ params, searchParams }: { params: { id: str
         <section className="pn">
           <h2>Materiais complementares</h2>
           {resources.map((r: any) => (
-            <div className="li" key={r.id}>
-              <a href={r.url} target="_blank" rel="noopener noreferrer">{r.title}</a>
+            <div className="li" key={r.id} style={{ flexWrap: 'wrap' }}>
+              <a href={(r.storage_path ? signed[r.storage_path] : r.url) ?? '#'} target="_blank" rel="noopener noreferrer">{r.title}</a>
               <span className="tag">{kinds[r.kind] ?? 'Link'}</span>
+              {r.kind === 'audio' && r.storage_path && signed[r.storage_path] && (
+                <audio controls preload="none" src={signed[r.storage_path]} style={{ width: '100%' }} />
+              )}
             </div>
           ))}
         </section>

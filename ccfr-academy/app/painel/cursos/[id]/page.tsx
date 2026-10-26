@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getCtx } from '@/lib/ctx';
+import CourseCover from '@/components/CourseCover';
 import { loadLearning, prerequisiteFor } from '@/lib/data';
 import { enroll, issueCertificate, toggleFavorite } from '../../actions';
 
@@ -24,6 +25,7 @@ export default async function Curso({ params, searchParams }: { params: { id: st
         <h1>{course.title}</h1>
         <p className="m">{course.description}</p>
       </div>
+      <CourseCover id={params.id} h={170} />
       {searchParams.erro && <div className="erro" role="alert">{searchParams.erro}</div>}
       {lock && <div className="erro" role="status">Este curso faz parte de uma trilha. Conclua antes: {lock}.</div>}
       <div className="row">

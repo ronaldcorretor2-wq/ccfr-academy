@@ -47,7 +47,7 @@ export default async function CursoAdmin({ params, searchParams }: { params: { i
       <section className="pn">
         <h2>Módulos e aulas</h2>
         {mods.map((mod) => (
-          <div key={mod.id} className="pn" style={{ background: '#111' }}>
+          <div key={mod.id} className="pn" style={{ background: 'var(--soft)' }}>
             <div className="row" style={{ justifyContent: 'space-between' }}>
               <h3>{mod.title}</h3>
               <Mover action={moveModule} id={mod.id} courseId={id} />

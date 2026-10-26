@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
+import CourseCover from '@/components/CourseCover';
 import { getCtx } from '@/lib/ctx';
 import { loadLearning } from '@/lib/data';
 import { joinOrg } from './actions';
@@ -57,10 +58,13 @@ export default async function Painel({ searchParams }: { searchParams: { erro?: 
         <p className="m">{courses.length ? 'Escolha um curso para estudar.' : 'Ainda não há cursos publicados na sua igreja.'}</p>
       </div>
       {continueId && (
-        <section className="pn">
-          <span className="tag" style={{ alignSelf: 'flex-start' }}>Continue de onde parou</span>
-          <h2>{continueTitle}</h2>
-          <Link className="btn" href={`/painel/aula/${continueId}`}>Continuar aula</Link>
+        <section className="hero">
+          <div className="txt">
+            <span className="tag" style={{ alignSelf: 'flex-start' }}>Continue de onde parou</span>
+            <h2 style={{ fontSize: 28, margin: 0 }}>{continueTitle}</h2>
+            <Link className="btn" href={`/painel/aula/${continueId}`}>Continuar aula</Link>
+          </div>
+          <div className="art">{startCourse && <CourseCover id={startCourse} h={240} />}</div>
         </section>
       )}
       <section>
@@ -68,6 +72,7 @@ export default async function Painel({ searchParams }: { searchParams: { erro?: 
         <div className="g">
           {ordered.map((c) => (
             <Link key={c.id} href={`/painel/cursos/${c.id}`} className="pn" style={{ textDecoration: 'none' }}>
+              <CourseCover id={c.id} h={110} />
               <h3>{c.title}</h3>
               {favs.has(c.id) && <span className="tag" style={{ alignSelf: 'flex-start' }}>Favorito</span>}
               {c.status !== 'published' && <span className="tag" style={{ alignSelf: 'flex-start' }}>Rascunho (só equipe vê)</span>}
