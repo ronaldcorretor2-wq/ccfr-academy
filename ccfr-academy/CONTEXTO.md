@@ -11,3 +11,4 @@
 - Envio de PDF/áudio e logotipo via Supabase Storage (migração 007, bucket privado materiais, caminho começa pelo id da igreja), visual final: fontes Schibsted/Hanken, tema claro/escuro, capas geométricas provisórias, hero no dashboard. Pendente: fotos reais das capas, domínios próprios, subdomínios.
 - Recuperação de senha (/recuperar, /auth/callback), avisos da igreja, catálogo público opcional /c/ENDEREÇO (migração 008). LEIA-ME.md atualizado. Pendente: fotos de capa, subdomínios, notificações.
 - Notificações dentro do site (migração 009): gatilhos no banco para novo aviso, novo curso publicado e certificado.
+- Foto de capa por curso (migração 010, enviada pela equipe; sem foto usa o padrão geométrico). Pendente: subdomínios/domínios próprios, notificações por e-mail.

@@ -3,7 +3,15 @@ import type { ReactNode } from 'react';
 const SHADES = ['#1F1F1F', '#2B2B2B', '#3A3A3A', '#232323', '#333333', '#161616'];
 
 // Capa provisória em padrão geométrico (cada curso recebe sempre o mesmo desenho). Trocar por foto depois.
-export default function CourseCover({ id, h = 130 }: { id: string; h?: number }) {
+export default function CourseCover({ id, h = 130, src }: { id: string; h?: number; src?: string }) {
+  if (src) {
+    return (
+      <span className="cv" aria-hidden="true">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={src} alt="" style={{ display: 'block', width: '100%', height: h, objectFit: 'cover' }} />
+      </span>
+    );
+  }
   let s = 0;
   for (const ch of id) s = (s * 31 + ch.charCodeAt(0)) >>> 0;
   const kind = s % 6;

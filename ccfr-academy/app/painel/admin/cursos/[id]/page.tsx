@@ -2,12 +2,15 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { requireStaff } from '@/lib/ctx';
 import ConfirmButton from '@/components/ConfirmButton';
-import { addLesson, addModule, deleteCourse, deleteLesson, deleteModule, moveLesson, moveModule, setStatus, updateCourse } from '../../../actions';
+import CourseCover from '@/components/CourseCover';
+import UploadCover from '@/components/UploadCover';
+import { signCovers } from '@/lib/data';
+import { addLesson, addModule, deleteCourse, deleteLesson, deleteModule, moveLesson, moveModule, saveCover, setStatus, updateCourse } from '../../../actions';
 
 export default async function CursoAdmin({ params, searchParams }: { params: { id: string }; searchParams: { erro?: string; ok?: string } }) {
-  const { supabase } = await requireStaff();
+  const { supabase, member } = await requireStaff();
   const id = params.id;
-  const { data: course } = await supabase.from('courses').select('id,title,description,status').eq('id', id).maybeSingle();
+  const { data: course } = await supabase.from('courses').select('id,title,description,status,cover_path').eq('id', id).maybeSingle();
   if (!course) notFound();
   const [{ data: m }, { data: l }, { data: e }] = await Promise.all([
     supabase.from('course_modules').select('id,title,position').eq('course_id', id).order('position'),
@@ -23,6 +26,7 @@ export default async function CursoAdmin({ params, searchParams }: { params: { i
     : { data: [] as any[] };
   const doneBy: Record<string, number> = {};
   for (const r of (pr ?? []) as any[]) doneBy[r.user_id] = (doneBy[r.user_id] ?? 0) + 1;
+  const covers = await signCovers(supabase, [course]);
   const published = course.status === 'published';
   const nameOf = (x: any) => (Array.isArray(x.profiles) ? x.profiles[0]?.full_name : x.profiles?.full_name) || 'Aluno sem nome';
 
@@ -43,6 +47,9 @@ export default async function CursoAdmin({ params, searchParams }: { params: { i
         <label>Descrição<textarea className="in" name="description" defaultValue={course.description} /></label>
         <button className="btn" type="submit">Salvar alterações</button>
       </form>
+
+      <CourseCover id={id} h={160} src={covers[id]} />
+      <UploadCover courseId={id} orgId={member.orgId} save={saveCover} />
 
       <section className="pn">
         <h2>Módulos e aulas</h2>

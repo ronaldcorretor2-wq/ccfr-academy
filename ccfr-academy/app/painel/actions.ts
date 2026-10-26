@@ -489,3 +489,14 @@ export async function markRead(fd: FormData) {
   revalidatePath('/painel', 'layout');
   redirect('/painel/notificacoes');
 }
+
+export async function saveCover(courseId: string, path: string): Promise<{ ok: boolean; msg?: string }> {
+  const { supabase, member } = await requireStaff();
+  if (!path.startsWith(`${member.orgId}/covers/${courseId}/`)) return { ok: false, msg: 'Caminho de arquivo inválido.' };
+  const { data: old } = await supabase.from('courses').select('cover_path').eq('id', courseId).maybeSingle();
+  const { error } = await supabase.from('courses').update({ cover_path: path }).eq('id', courseId);
+  if (error) return { ok: false, msg: 'Não foi possível salvar a capa.' };
+  if (old?.cover_path) await supabase.storage.from('materiais').remove([old.cover_path]);
+  revalidatePath('/painel', 'layout');
+  return { ok: true };
+}

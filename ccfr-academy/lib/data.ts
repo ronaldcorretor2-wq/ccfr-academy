@@ -1,6 +1,6 @@
 export async function loadLearning(supabase: any, userId: string) {
   const [c, m, l, p] = await Promise.all([
-    supabase.from('courses').select('id,title,description,status').order('created_at'),
+    supabase.from('courses').select('id,title,description,status,cover_path').order('created_at'),
     supabase.from('course_modules').select('id,course_id,title,position').order('position'),
     supabase.from('lessons').select('id,course_id,module_id,title,position').order('position'),
     supabase.from('lesson_progress').select('lesson_id,completed,updated_at').eq('user_id', userId),
@@ -48,4 +48,19 @@ export async function prerequisiteFor(supabase: any, courseId: string, byCourse:
     }
   }
   return null;
+}
+
+// Endereços temporários das fotos de capa (arquivos privados)
+export async function signCovers(supabase: any, courses: any[]): Promise<Record<string, string>> {
+  const withCover = courses.filter((c: any) => c.cover_path);
+  const out: Record<string, string> = {};
+  if (!withCover.length) return out;
+  const { data } = await supabase.storage.from('materiais').createSignedUrls(withCover.map((c: any) => c.cover_path as string), 3600);
+  const byPath = new Map<string, string>();
+  for (const x of (data ?? []) as any[]) if (x.path && x.signedUrl) byPath.set(x.path as string, x.signedUrl as string);
+  for (const c of withCover) {
+    const u = byPath.get(c.cover_path as string);
+    if (u) out[c.id as string] = u;
+  }
+  return out;
 }

@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import CourseCover from '@/components/CourseCover';
 import { getCtx } from '@/lib/ctx';
-import { loadLearning } from '@/lib/data';
+import { loadLearning, signCovers } from '@/lib/data';
 import { joinOrg } from './actions';
 
 export default async function Painel({ searchParams }: { searchParams: { erro?: string } }) {
@@ -34,6 +34,7 @@ export default async function Painel({ searchParams }: { searchParams: { erro?: 
   }
 
   const { courses, byCourse, done, last } = await loadLearning(supabase, user.id);
+  const covers = await signCovers(supabase, courses);
   const { data: av } = await supabase.from('announcements').select('id,title,body,created_at').order('created_at', { ascending: false }).limit(3);
   const notices: any[] = av ?? [];
   const { data: fv } = await supabase.from('favorites').select('course_id').eq('user_id', user.id);
@@ -66,7 +67,7 @@ export default async function Painel({ searchParams }: { searchParams: { erro?: 
             <h2 style={{ fontSize: 28, margin: 0 }}>{continueTitle}</h2>
             <Link className="btn" href={`/painel/aula/${continueId}`}>Continuar aula</Link>
           </div>
-          <div className="art">{startCourse && <CourseCover id={startCourse} h={240} />}</div>
+          <div className="art">{startCourse && <CourseCover id={startCourse} h={240} src={covers[startCourse]} />}</div>
         </section>
       )}
       {notices.length > 0 && (
@@ -88,7 +89,7 @@ export default async function Painel({ searchParams }: { searchParams: { erro?: 
         <div className="g">
           {ordered.map((c) => (
             <Link key={c.id} href={`/painel/cursos/${c.id}`} className="pn" style={{ textDecoration: 'none' }}>
-              <CourseCover id={c.id} h={110} />
+              <CourseCover id={c.id} h={110} src={covers[c.id]} />
               <h3>{c.title}</h3>
               {favs.has(c.id) && <span className="tag" style={{ alignSelf: 'flex-start' }}>Favorito</span>}
               {c.status !== 'published' && <span className="tag" style={{ alignSelf: 'flex-start' }}>Rascunho (só equipe vê)</span>}
