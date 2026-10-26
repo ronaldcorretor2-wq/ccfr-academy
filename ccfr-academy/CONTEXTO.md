@@ -7,3 +7,4 @@
 - Avaliações (migração 002): questionário por aula, correção no banco (função submit_attempt); gabarito em tabela só da equipe; aula com avaliação só conclui após aprovação.
 - Retomar vídeo (YouTube IFrame API, posição salva a cada 10 s) e certificados (migração 003: emissão por função no banco, código verificável em /verificar/CÓDIGO).
 - Anotações, favoritos, materiais (links), trilhas com pré-requisito (checado no servidor) e relatórios por curso (migração 004). Pendente: segurança (trancar criação de igrejas, auditoria), painel mestre, testes de isolamento, upload de arquivos (Storage), visual final.
+- Segurança (migração 005): só o painel mestre cria igrejas (platform_admins), plano e limite de alunos, auditoria por gatilhos. Testes de isolamento: 006 (select * from run_isolation_tests()). Pendente: upload de arquivos (Storage), visual final, domínios.

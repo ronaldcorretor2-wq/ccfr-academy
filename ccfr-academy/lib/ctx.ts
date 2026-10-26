@@ -24,3 +24,10 @@ export async function requireStaff() {
   if (!ctx.member || !ctx.isStaff) redirect('/painel');
   return ctx as typeof ctx & { member: NonNullable<typeof ctx.member> };
 }
+
+export async function requirePlatform() {
+  const { supabase, user } = await getCtx();
+  const { data } = await supabase.rpc('is_platform_admin');
+  if (data !== true) redirect('/painel');
+  return { supabase, user };
+}

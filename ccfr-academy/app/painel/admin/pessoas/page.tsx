@@ -11,11 +11,12 @@ export default async function Pessoas({ searchParams }: { searchParams: { erro?:
   if (member.role !== 'admin') redirect('/painel/admin');
   const { data } = await supabase
     .from('organization_members')
-    .select('user_id, role, joined_at, profiles(full_name)')
+    .select('user_id, role, joined_at, profiles(full_name, email)')
     .eq('org_id', member.orgId)
     .order('joined_at');
   const people: any[] = data ?? [];
   const nameOf = (x: any) => (Array.isArray(x.profiles) ? x.profiles[0]?.full_name : x.profiles?.full_name) || 'Sem nome';
+  const emailOf = (x: any) => (Array.isArray(x.profiles) ? x.profiles[0]?.email : x.profiles?.email) ?? '';
   return (
     <>
       <div>
@@ -28,7 +29,7 @@ export default async function Pessoas({ searchParams }: { searchParams: { erro?:
       <section className="pn">
         {people.map((p) => (
           <div className="li" key={p.user_id}>
-            <span style={{ flex: 1 }}>{nameOf(p)}{p.user_id === user.id ? ' (você)' : ''}</span>
+            <span style={{ flex: 1 }}>{nameOf(p)}{p.user_id === user.id ? ' (você)' : ''}<br /><span className="m">{emailOf(p)}</span></span>
             {p.user_id === user.id ? (
               <span className="tag">{nomes[p.role]}</span>
             ) : (

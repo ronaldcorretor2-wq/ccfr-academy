@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { getCtx } from '@/lib/ctx';
 import { loadLearning } from '@/lib/data';
-import { createOrg, joinOrg } from './actions';
+import { joinOrg } from './actions';
 
 export default async function Painel({ searchParams }: { searchParams: { erro?: string } }) {
   const { supabase, user, member } = await getCtx();
@@ -16,21 +16,17 @@ export default async function Painel({ searchParams }: { searchParams: { erro?: 
   }
 
   if (!member) {
+    const { data: pa } = await supabase.rpc('is_platform_admin');
     return (
       <>
         <h1>Bem-vindo à CCFR Academy</h1>
-        <p className="m">Para começar, entre na sua igreja ou cadastre uma nova.</p>
+        <p className="m">Para começar, entre na sua igreja usando o endereço que ela passou para você.</p>
+        {pa === true && <Link className="btn" href="/painel/mestre">Abrir o painel mestre</Link>}
         {searchParams.erro && <div className="erro" role="alert">{searchParams.erro}</div>}
         <form className="pn" action={joinOrg}>
           <h2>Entrar numa igreja</h2>
           <label>Endereço da igreja (ex.: ccfr)<input className="in" name="slug" required /></label>
           <button className="btn" type="submit">Entrar na igreja</button>
-        </form>
-        <form className="pn" action={createOrg}>
-          <h2>Cadastrar uma nova igreja</h2>
-          <label>Nome da igreja<input className="in" name="name" required minLength={2} /></label>
-          <label>Endereço curto (letras minúsculas, números e hífen)<input className="in" name="slug" required pattern="[a-z0-9\-]{3,40}" /></label>
-          <button className="btn" type="submit">Cadastrar igreja</button>
         </form>
       </>
     );

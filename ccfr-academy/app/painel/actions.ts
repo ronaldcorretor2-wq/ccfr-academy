@@ -2,7 +2,7 @@
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
-import { getCtx, requireStaff } from '@/lib/ctx';
+import { getCtx, requirePlatform, requireStaff } from '@/lib/ctx';
 
 const txt = (fd: FormData, k: string) => String(fd.get(k) ?? '').trim();
 const back = (path: string, k: 'erro' | 'ok', msg: string): never => redirect(`${path}?${k}=${encodeURIComponent(msg)}`);
@@ -13,17 +13,34 @@ export async function signOut() {
 }
 
 export async function createOrg(fd: FormData) {
-  const { supabase } = await getCtx();
-  const slug = txt(fd, 'slug').toLowerCase();
-  const { error } = await supabase.rpc('create_organization', { p_name: txt(fd, 'name'), p_slug: slug });
-  if (error) back('/painel', 'erro', 'Não foi possível criar a igreja. O endereço precisa ter de 3 a 40 letras minúsculas, números ou hífens, e não pode já existir.');
-  redirect('/painel');
+  const { supabase } = await requirePlatform();
+  const { error } = await supabase.rpc('create_organization', {
+    p_name: txt(fd, 'name'), p_slug: txt(fd, 'slug').toLowerCase(), p_admin_email: txt(fd, 'email'),
+  });
+  if (error) back('/painel/mestre', 'erro', 'Não foi possível criar a igreja. Confira o nome, o endereço curto (3 a 40 letras minúsculas, números ou hífen, sem repetir) e se o administrador já criou a conta com esse e-mail.');
+  back('/painel/mestre', 'ok', 'Igreja criada.');
+}
+
+export async function masterSetAdmin(fd: FormData) {
+  const { supabase } = await requirePlatform();
+  const { error } = await supabase.rpc('master_set_admin', { p_org: txt(fd, 'org_id'), p_email: txt(fd, 'email') });
+  if (error) back('/painel/mestre', 'erro', 'Não foi possível adicionar o administrador. Ele precisa ter criado a conta com esse e-mail.');
+  back('/painel/mestre', 'ok', 'Administrador adicionado.');
+}
+
+export async function masterUpdateOrg(fd: FormData) {
+  const { supabase } = await requirePlatform();
+  const { error } = await supabase.rpc('master_update_org', {
+    p_org: txt(fd, 'org_id'), p_plan: txt(fd, 'plan') || 'teste', p_max: Math.max(0, Number(txt(fd, 'max')) || 0),
+  });
+  if (error) back('/painel/mestre', 'erro', 'Não foi possível salvar o plano.');
+  back('/painel/mestre', 'ok', 'Plano e limite salvos.');
 }
 
 export async function joinOrg(fd: FormData) {
   const { supabase } = await getCtx();
   const { error } = await supabase.rpc('join_organization', { p_slug: txt(fd, 'slug') });
-  if (error) back('/painel', 'erro', 'Igreja não encontrada. Confira o endereço com a sua igreja.');
+  if (error) back('/painel', 'erro', 'Não foi possível entrar. Confira o endereço da igreja; se estiver certo, o limite de vagas pode ter sido atingido, e a igreja precisa ser avisada.');
   redirect('/painel');
 }
 
