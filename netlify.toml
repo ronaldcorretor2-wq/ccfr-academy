@@ -1,2 +1,3 @@
 [build]
+  base = "ccfr-academy"
   command = "npm run build"
