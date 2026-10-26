@@ -12,3 +12,4 @@
 - Recuperação de senha (/recuperar, /auth/callback), avisos da igreja, catálogo público opcional /c/ENDEREÇO (migração 008). LEIA-ME.md atualizado. Pendente: fotos de capa, subdomínios, notificações.
 - Notificações dentro do site (migração 009): gatilhos no banco para novo aviso, novo curso publicado e certificado.
 - Foto de capa por curso (migração 010, enviada pela equipe; sem foto usa o padrão geométrico). Pendente: subdomínios/domínios próprios, notificações por e-mail.
+- Tela de login com abas (Entrar/Criar conta) e identidade da igreja; logotipo em pasta pública logos (migração 011); variável opcional IGREJA_PADRAO.

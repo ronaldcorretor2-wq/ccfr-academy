@@ -14,10 +14,13 @@ Plataforma de ensino cristão com várias igrejas (multi-tenant). Next.js 14 + S
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`: chave anon ou publishable. **Nunca** use a service_role.
 
 ## Banco de dados: ordem dos arquivos em `supabase/migrations`
-001, 002, 003, 004, 005, 007, 008, 009 e 010 (rode cada um uma vez; do 002 em diante podem ser repetidos sem erro se forem a versão reexecutável). O `006` cria a função de teste: rode-o e depois `select * from run_isolation_tests();`. Todas as 16 linhas devem dar `passou = true`.
+001, 002, 003, 004, 005, 007, 008, 009, 010 e 011 (rode cada um uma vez; do 002 em diante podem ser repetidos sem erro se forem a versão reexecutável). O `006` cria a função de teste: rode-o e depois `select * from run_isolation_tests();`. Todas as 16 linhas devem dar `passou = true`.
 
 Depois do 005, torne-se dono da plataforma (troque o e-mail):
 `insert into platform_admins (user_id) select id from auth.users where email = 'SEU-EMAIL';`
+
+## Variável opcional
+- `IGREJA_PADRAO` (Netlify): endereço curto da igreja (ex.: `ccfr`). Quando preenchida, a tela de login mostra o logotipo e o nome dessa igreja e quem cria conta entra nela automaticamente. Sem ela, a tela é genérica.
 
 ## Supabase: configurações
 - **Authentication > URL Configuration:** Site URL = endereço do site. Em **Redirect URLs**, adicione `https://SEU-SITE/auth/callback`.

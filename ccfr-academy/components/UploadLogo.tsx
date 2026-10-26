@@ -19,7 +19,7 @@ export default function UploadLogo({ orgId, save }: { orgId: string; save: (path
     setMsg('Enviando...');
     const safe = file.name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-zA-Z0-9._-]+/g, '-');
     const path = `${orgId}/logo/${crypto.randomUUID()}-${safe}`;
-    const { error } = await createClient().storage.from('materiais').upload(path, file, { contentType: file.type });
+    const { error } = await createClient().storage.from('logos').upload(path, file, { contentType: file.type });
     if (error) { setBusy(false); setMsg('Não foi possível enviar a imagem.'); return; }
     const r = await save(path);
     setBusy(false);

@@ -432,8 +432,10 @@ export async function saveLogo(path: string): Promise<{ ok: boolean; msg?: strin
   const { supabase, member } = await requireStaff();
   if (member.role !== 'admin') return { ok: false, msg: 'Só o administrador pode trocar o logotipo.' };
   if (!path.startsWith(`${member.orgId}/logo/`)) return { ok: false, msg: 'Caminho de arquivo inválido.' };
+  const { data: old } = await supabase.from('organizations').select('logo_path').eq('id', member.orgId).single();
   const { error } = await supabase.from('organizations').update({ logo_path: path }).eq('id', member.orgId);
   if (error) return { ok: false, msg: 'Não foi possível salvar o logotipo.' };
+  if (old?.logo_path) await supabase.storage.from('logos').remove([old.logo_path]);
   revalidatePath('/painel', 'layout');
   return { ok: true };
 }

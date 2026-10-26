@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { requireStaff } from '@/lib/ctx';
 import UploadLogo from '@/components/UploadLogo';
+import { publicLogo } from '@/lib/logo';
 import { siteOrigin } from '@/lib/origin';
 import { saveLogo, togglePublicCatalog, updateOrgName } from '../../actions';
 
@@ -33,6 +34,12 @@ export default async function Configuracoes({ searchParams }: { searchParams: { 
           <button className="btn" type="submit">{pub ? 'Desligar catálogo público' : 'Ligar catálogo público'}</button>
         </form>
       </section>
+      {member.logoPath && (
+        <section className="pn">
+          <h2>Logotipo atual</h2>
+          <img src={publicLogo(member.logoPath)} alt="Logotipo atual da igreja" style={{ maxHeight: 80, maxWidth: 240, objectFit: 'contain' }} />
+        </section>
+      )}
       <UploadLogo orgId={member.orgId} save={saveLogo} />
     </>
   );

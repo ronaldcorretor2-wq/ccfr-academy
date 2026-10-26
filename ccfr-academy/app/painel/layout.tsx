@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { getCtx } from '@/lib/ctx';
 import NavItem from '@/components/NavItem';
 import ThemeToggle from '@/components/ThemeToggle';
+import { publicLogo } from '@/lib/logo';
 import { signOut } from './actions';
 
 const I = {
@@ -17,16 +18,12 @@ export default async function PainelLayout({ children }: { children: ReactNode }
   const { supabase, user, member, isStaff } = await getCtx();
   const { data: pa } = await supabase.rpc('is_platform_admin');
   const { count: unread } = await supabase.from('notifications').select('id', { count: 'exact', head: true }).eq('user_id', user.id).is('read_at', null);
-  let logoUrl: string | null = null;
-  if (member?.logoPath) {
-    const { data } = await supabase.storage.from('materiais').createSignedUrl(member.logoPath, 3600);
-    logoUrl = data?.signedUrl ?? null;
-  }
+  const logo = member?.logoPath ? publicLogo(member.logoPath) : null;
   return (
     <div className="shell">
       <nav className="sb" aria-label="Principal">
         <div className="lg">
-          {logoUrl ? <img className="lgimg" src={logoUrl} alt="" /> : <i>CCFR</i>}
+          {logo ? <img className="lgimg" src={logo} alt="" /> : <i>CCFR</i>}
           <div><b>Academy</b><span>{member?.orgName ?? ''}</span></div>
         </div>
         <NavItem href="/painel" d={I.home} exact>Início</NavItem>
