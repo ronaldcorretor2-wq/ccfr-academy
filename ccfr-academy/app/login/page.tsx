@@ -1,6 +1,7 @@
+import Link from 'next/link';
 import { signIn, signUp } from './actions';
 
-export default function Login({ searchParams }: { searchParams: { erro?: string; ok?: string } }) {
+export default function Login({ searchParams }: { searchParams: { erro?: string; ok?: string; igreja?: string } }) {
   return (
     <div className="center">
       <h1>CCFR Academy</h1>
@@ -11,12 +12,13 @@ export default function Login({ searchParams }: { searchParams: { erro?: string;
         <label>E-mail<input className="in" name="email" type="email" required autoComplete="email" /></label>
         <label>Senha<input className="in" name="password" type="password" required autoComplete="current-password" /></label>
         <button className="btn" type="submit">Entrar</button>
+        <Link className="m" href="/recuperar">Esqueci minha senha</Link>
       </form>
       <form className="pn" action={signUp}>
         <h2>Criar conta</h2>
         <label>Nome completo<input className="in" name="full_name" required /></label>
         <label>E-mail<input className="in" name="email" type="email" required autoComplete="email" /></label>
-        <label>Endereço da sua igreja (alunos e professores: peça à sua igreja)<input className="in" name="church_slug" placeholder="ex.: ccfr" /></label>
+        <label>Endereço da sua igreja (alunos e professores: peça à sua igreja)<input className="in" name="church_slug" placeholder="ex.: ccfr" defaultValue={searchParams.igreja ?? ''} /></label>
         <label>Senha (mínimo de 8 caracteres)<input className="in" name="password" type="password" minLength={8} required autoComplete="new-password" /></label>
         <button className="btn" type="submit">Criar conta</button>
       </form>

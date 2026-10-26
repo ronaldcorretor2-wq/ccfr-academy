@@ -448,3 +448,28 @@ export async function updateOrgName(fd: FormData) {
   revalidatePath('/painel', 'layout');
   back('/painel/admin/configuracoes', 'ok', 'Nome salvo.');
 }
+
+// ---------- Avisos e catálogo público ----------
+
+export async function createAnnouncement(fd: FormData) {
+  const { supabase, member } = await requireStaff();
+  const { error } = await supabase.from('announcements').insert({ org_id: member.orgId, title: txt(fd, 'title'), body: txt(fd, 'body') });
+  if (error) back('/painel/admin/avisos', 'erro', 'Não foi possível publicar o aviso.');
+  revalidatePath('/painel', 'layout');
+  back('/painel/admin/avisos', 'ok', 'Aviso publicado.');
+}
+
+export async function deleteAnnouncement(fd: FormData) {
+  const { supabase } = await requireStaff();
+  await supabase.from('announcements').delete().eq('id', txt(fd, 'id'));
+  revalidatePath('/painel', 'layout');
+  redirect('/painel/admin/avisos');
+}
+
+export async function togglePublicCatalog(fd: FormData) {
+  const { supabase, member } = await requireStaff();
+  if (member.role !== 'admin') redirect('/painel/admin');
+  const { error } = await supabase.from('organizations').update({ public_catalog: txt(fd, 'value') === 'on' }).eq('id', member.orgId);
+  if (error) back('/painel/admin/configuracoes', 'erro', 'Não foi possível alterar o catálogo público.');
+  back('/painel/admin/configuracoes', 'ok', 'Catálogo público atualizado.');
+}

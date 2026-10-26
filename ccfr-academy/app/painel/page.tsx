@@ -34,6 +34,8 @@ export default async function Painel({ searchParams }: { searchParams: { erro?: 
   }
 
   const { courses, byCourse, done, last } = await loadLearning(supabase, user.id);
+  const { data: av } = await supabase.from('announcements').select('id,title,body,created_at').order('created_at', { ascending: false }).limit(3);
+  const notices: any[] = av ?? [];
   const { data: fv } = await supabase.from('favorites').select('course_id').eq('user_id', user.id);
   const favs = new Set<string>(((fv ?? []) as any[]).map((x: any) => x.course_id as string));
   const ordered = [...courses].sort((a, b) => Number(favs.has(b.id)) - Number(favs.has(a.id)));
@@ -65,6 +67,20 @@ export default async function Painel({ searchParams }: { searchParams: { erro?: 
             <Link className="btn" href={`/painel/aula/${continueId}`}>Continuar aula</Link>
           </div>
           <div className="art">{startCourse && <CourseCover id={startCourse} h={240} />}</div>
+        </section>
+      )}
+      {notices.length > 0 && (
+        <section className="pn">
+          <h2>Avisos da igreja</h2>
+          {notices.map((n: any) => (
+            <div className="li" key={n.id} style={{ alignItems: 'flex-start' }}>
+              <div style={{ flex: 1 }}>
+                <h3>{n.title}</h3>
+                {n.body && <p className="m" style={{ whiteSpace: 'pre-wrap' }}>{n.body}</p>}
+              </div>
+              <span className="m">{new Date(n.created_at).toLocaleDateString('pt-BR')}</span>
+            </div>
+          ))}
         </section>
       )}
       <section>

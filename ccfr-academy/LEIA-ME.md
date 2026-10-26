@@ -1,33 +1,36 @@
-# CCFR Academy: primeira versão funcional
+# CCFR Academy
 
-Plataforma de ensino com várias igrejas (multi-tenant). Next.js + Supabase, para publicar no Netlify.
+Plataforma de ensino cristão com várias igrejas (multi-tenant). Next.js 14 + Supabase (login, banco com RLS e arquivos). Publicação no Netlify, código no GitHub.
 
-## O que já funciona
-- Cadastro, login e saída (senha guardada com segurança pelo Supabase).
-- Criar uma igreja (quem cria vira administrador) ou entrar numa igreja pelo endereço curto (como aluno).
-- Administração: criar curso, módulos e aulas (vídeo do YouTube + texto), publicar/despublicar, excluir com confirmação.
-- Um curso só é publicado com título, descrição e pelo menos uma aula.
-- Aluno: vê cursos publicados, matricula-se, assiste, conclui aulas e vê o percentual; "Continuar aula".
-- Administrador vê o progresso dos alunos matriculados em cada curso.
-- Isolamento entre igrejas feito no banco (RLS). O papel de cada pessoa vem sempre do banco, nunca do navegador.
+## O que existe
+- **Aluno:** painel com "Continuar aula", cursos com progresso, favoritos, trilhas com pré-requisito, sala de aula (vídeo do YouTube que retoma de onde parou, texto, materiais, anotações, avaliação com correção automática), certificados com código verificável, avisos da igreja, tema claro e escuro.
+- **Administração da igreja:** cursos, módulos e aulas (editar, reordenar), envio de PDF e áudio, avaliações, publicação com trava de curso incompleto, trilhas, pessoas e papéis (aluno, professor, administrador), relatórios, avisos, registro de ações, nome e logotipo, catálogo público opcional.
+- **Painel mestre (dono da plataforma):** cadastra igrejas, define plano e limite de alunos.
+- **Segurança:** isolamento entre igrejas no banco (RLS), papéis vindos do banco, gabarito invisível ao aluno, arquivos privados por igreja, 16 testes automáticos de isolamento.
+- **Acesso:** cadastro, login, recuperação de senha, e-mail de confirmação que já abre a sessão.
 
-## O que ainda NÃO existe
-Retomar o vídeo no segundo exato, anotações, favoritos, avaliações, certificados, trilhas, upload de PDF/áudio, reordenar módulos e aulas, editar uma aula já criada, recuperação de senha, painel mestre do SaaS, registro de ações (auditoria) e testes automatizados. O visual é provisório.
+## Variáveis de ambiente (Netlify)
+- `NEXT_PUBLIC_SUPABASE_URL`: Project URL do Supabase (sem `/rest/v1/` no final).
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`: chave anon ou publishable. **Nunca** use a service_role.
 
-## Passo a passo
-1. **Banco:** no Supabase, abra **SQL Editor**, crie uma consulta nova, cole o conteúdo de `supabase/migrations/001_inicial.sql` e clique em **Run**.
-2. **Para testar mais fácil:** em **Authentication**, na configuração do provedor de e-mail, desligue "Confirm email". (Depois, para valer, ligue de novo.)
-3. **Chaves:** em **Project Settings > API**, copie o **Project URL** e a chave **anon** (ou "publishable"). Nunca use a chave "service_role".
-4. **GitHub:** descompacte o zip e envie todos os arquivos e pastas para o repositório (Add file > Upload files).
-5. **Netlify:** Add new site > Import an existing project > GitHub > escolha o repositório. Em **Environment variables**, crie:
-   - `NEXT_PUBLIC_SUPABASE_URL` = o Project URL
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` = a chave anon/publishable
-   Depois clique em Deploy.
-6. Com o site no ar, copie o endereço dele e coloque em **Supabase > Authentication > URL Configuration > Site URL**.
+## Banco de dados: ordem dos arquivos em `supabase/migrations`
+001, 002, 003, 004, 005, 007 e 008 (rode cada um uma vez; do 002 em diante podem ser repetidos sem erro se forem a versão reexecutável). O `006` cria a função de teste: rode-o e depois `select * from run_isolation_tests();`. Todas as 16 linhas devem dar `passou = true`.
 
-## Teste de ponta a ponta
-1. Crie uma conta e cadastre a igreja (ex.: nome "CCFR", endereço "ccfr"). 2. Em Administração, crie um curso, um módulo e uma aula. 3. Preencha a descrição e publique. 4. Em outro navegador (ou janela anônima), crie outra conta e entre na igreja "ccfr". 5. O aluno matricula-se, assiste e conclui a aula. 6. O administrador abre o curso e vê o progresso. 7. Crie uma terceira conta e outra igreja ("outra-igreja"). 8. Confirme que ela não vê nenhum curso da primeira.
+Depois do 005, torne-se dono da plataforma (troque o e-mail):
+`insert into platform_admins (user_id) select id from auth.users where email = 'SEU-EMAIL';`
 
-## Segurança: pontos de atenção
-- Hoje qualquer pessoa logada pode cadastrar uma igreja e entrar em qualquer igreja que conheça o endereço. Isso é para a fase de testes; antes de vender para outras igrejas, o cadastro de igrejas passa para o painel mestre e a entrada de alunos ganha aprovação.
-- Nunca coloque a chave `service_role` no Netlify nem no GitHub.
+## Supabase: configurações
+- **Authentication > URL Configuration:** Site URL = endereço do site. Em **Redirect URLs**, adicione `https://SEU-SITE/auth/callback`.
+- **Authentication > Email:** "Confirm email" ligado em produção.
+
+## Publicação
+GitHub recebe o código; o Netlify publica sozinho a cada envio. Se o repositório tiver a pasta `ccfr-academy` dentro dele, o `netlify.toml` na raiz precisa ter `base = "ccfr-academy"`.
+
+## Fluxo para uma nova igreja
+1. O administrador da igreja cria a conta no site.
+2. No painel mestre, cadastre a igreja com o e-mail dele (nome, endereço curto, administrador).
+3. Os alunos criam conta informando o endereço da igreja (ou usam o link `/c/ENDEREÇO` se o catálogo público estiver ligado).
+4. O administrador promove professores em Administração > Pessoas.
+
+## Ainda não existe
+Fotos de capa dos cursos (hoje há capas geométricas provisórias), subdomínios e domínios próprios por igreja, notificações, questões abertas e de resposta múltipla, relatórios aluno a aluno exportáveis, histórico de uso de armazenamento.
