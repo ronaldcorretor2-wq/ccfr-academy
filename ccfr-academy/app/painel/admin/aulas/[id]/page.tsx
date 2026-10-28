@@ -1,3 +1,4 @@
+import SubmitButton from '@/components/SubmitButton';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { requireStaff } from '@/lib/ctx';
@@ -35,7 +36,7 @@ export default async function EditarAula({ params, searchParams }: { params: { i
         <label>Título da aula<input className="in" name="title" defaultValue={a.title} required /></label>
         <label>Link do vídeo (YouTube, opcional)<input className="in" name="video_url" type="url" defaultValue={a.video_url ?? ''} /></label>
         <label>Texto da aula<textarea className="in" name="content" defaultValue={a.content} /></label>
-        <button className="btn" type="submit">Salvar aula</button>
+        <SubmitButton className="btn">Salvar aula</SubmitButton>
       </form>
 
       <section className="pn">
@@ -46,7 +47,7 @@ export default async function EditarAula({ params, searchParams }: { params: { i
             <p className="m">Esta aula ainda não tem avaliação. Quando houver, o aluno só conclui a aula depois de ser aprovado.</p>
             <label>Título<input className="in" name="title" defaultValue="Questionário" /></label>
             <label>Nota mínima para aprovação (de 1 a 100)<input className="in" name="pass_score" type="number" min={1} max={100} defaultValue={70} /></label>
-            <button className="btn" type="submit">Criar avaliação</button>
+            <SubmitButton className="btn">Criar avaliação</SubmitButton>
           </form>
         ) : (
           <>
@@ -84,7 +85,7 @@ export default async function EditarAula({ params, searchParams }: { params: { i
                   <option value="0">A</option><option value="1">B</option><option value="2">C</option><option value="3">D</option>
                 </select>
               </label>
-              <button className="btn" type="submit">Adicionar pergunta</button>
+              <SubmitButton className="btn">Adicionar pergunta</SubmitButton>
             </form>
           </>
         )}
@@ -112,7 +113,7 @@ export default async function EditarAula({ params, searchParams }: { params: { i
               <option value="link">Link</option><option value="pdf">PDF</option><option value="audio">Áudio</option><option value="outro">Outro</option>
             </select>
           </label>
-          <button className="btn" type="submit">Adicionar material</button>
+          <SubmitButton className="btn">Adicionar material</SubmitButton>
         </form>
       </section>
     </>

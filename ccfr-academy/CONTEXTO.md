@@ -13,3 +13,4 @@
 - Notificações dentro do site (migração 009): gatilhos no banco para novo aviso, novo curso publicado e certificado.
 - Foto de capa por curso (migração 010, enviada pela equipe; sem foto usa o padrão geométrico). Pendente: subdomínios/domínios próprios, notificações por e-mail.
 - Tela de login com abas (Entrar/Criar conta) e identidade da igreja; logotipo em pasta pública logos (migração 011); variável opcional IGREJA_PADRAO.
+- Resposta visual ao clique: botão com estado "Aguarde..." e giro (SubmitButton/ConfirmButton), efeito de pressionar em botões, menu e cartões, barra no topo ao navegar (NavProgress) e tela de carregamento (app/painel/loading.tsx).

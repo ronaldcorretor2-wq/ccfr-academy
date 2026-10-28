@@ -1,3 +1,4 @@
+import SubmitButton from '@/components/SubmitButton';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getCtx } from '@/lib/ctx';
@@ -33,12 +34,12 @@ export default async function Curso({ params, searchParams }: { params: { id: st
         {first && !lock && (enr || !member ? (
           <Link className="btn" href={`/painel/aula/${first.id}`}>{lessons.some((l) => done.has(l.id)) ? 'Continuar curso' : 'Começar curso'}</Link>
         ) : (
-          <form action={enroll}><input type="hidden" name="course_id" value={params.id} /><button className="btn" type="submit">Matricular-se</button></form>
+          <form action={enroll}><input type="hidden" name="course_id" value={params.id} /><SubmitButton className="btn">Matricular-se</SubmitButton></form>
         ))}
         {member && (
           <form action={toggleFavorite}>
             <input type="hidden" name="course_id" value={params.id} />
-            <button className="b2" type="submit">{fav ? 'Remover dos favoritos' : 'Favoritar'}</button>
+            <SubmitButton className="b2">{fav ? 'Remover dos favoritos' : 'Favoritar'}</SubmitButton>
           </form>
         )}
       </div>
@@ -48,7 +49,7 @@ export default async function Curso({ params, searchParams }: { params: { id: st
           {cert ? (
             <Link className="btn" href={`/painel/certificados/${cert.id}`}>Ver certificado</Link>
           ) : (
-            <form action={issueCertificate}><input type="hidden" name="course_id" value={params.id} /><button className="btn" type="submit">Emitir certificado</button></form>
+            <form action={issueCertificate}><input type="hidden" name="course_id" value={params.id} /><SubmitButton className="btn">Emitir certificado</SubmitButton></form>
           )}
         </section>
       )}

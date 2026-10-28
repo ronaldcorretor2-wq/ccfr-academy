@@ -1,3 +1,4 @@
+import SubmitButton from '@/components/SubmitButton';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { requireStaff } from '@/lib/ctx';
@@ -41,7 +42,7 @@ export default async function Pessoas({ searchParams }: { searchParams: { erro?:
                     <option value="teacher">Professor</option>
                     <option value="admin">Administrador</option>
                   </select>
-                  <button className="b2" type="submit">Alterar</button>
+                  <SubmitButton className="b2">Alterar</SubmitButton>
                 </form>
                 <form action={removeMember}>
                   <input type="hidden" name="user_id" value={p.user_id} />

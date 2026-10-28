@@ -1,3 +1,4 @@
+import SubmitButton from '@/components/SubmitButton';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { requireStaff } from '@/lib/ctx';
@@ -45,7 +46,7 @@ export default async function CursoAdmin({ params, searchParams }: { params: { i
         <h2>Dados do curso</h2>
         <label>Título<input className="in" name="title" defaultValue={course.title} required /></label>
         <label>Descrição<textarea className="in" name="description" defaultValue={course.description} /></label>
-        <button className="btn" type="submit">Salvar alterações</button>
+        <SubmitButton className="btn">Salvar alterações</SubmitButton>
       </form>
 
       <CourseCover id={id} h={160} src={covers[id]} />
@@ -80,14 +81,14 @@ export default async function CursoAdmin({ params, searchParams }: { params: { i
               <label>Título da aula<input className="in" name="title" required /></label>
               <label>Link do vídeo (YouTube, opcional)<input className="in" name="video_url" type="url" placeholder="https://www.youtube.com/watch?v=..." /></label>
               <label>Texto da aula (opcional)<textarea className="in" name="content" /></label>
-              <button className="btn" type="submit">Adicionar aula</button>
+              <SubmitButton className="btn">Adicionar aula</SubmitButton>
             </form>
           </div>
         ))}
         <form className="row" action={addModule}>
           <input type="hidden" name="course_id" value={id} />
           <label style={{ flex: 1 }}>Novo módulo<input className="in" name="title" required placeholder="Ex.: Módulo 1: Quem é Deus" /></label>
-          <button className="btn" type="submit" style={{ alignSelf: 'flex-end' }}>Adicionar módulo</button>
+          <SubmitButton className="btn" style={{ alignSelf: 'flex-end' }}>Adicionar módulo</SubmitButton>
         </form>
       </section>
 
@@ -97,7 +98,7 @@ export default async function CursoAdmin({ params, searchParams }: { params: { i
         <div className="row">
           <form action={setStatus}>
             <input type="hidden" name="id" value={id} /><input type="hidden" name="status" value={published ? 'draft' : 'published'} />
-            <button className="btn" type="submit">{published ? 'Voltar para rascunho' : 'Publicar curso'}</button>
+            <SubmitButton className="btn">{published ? 'Voltar para rascunho' : 'Publicar curso'}</SubmitButton>
           </form>
           <form action={deleteCourse}>
             <input type="hidden" name="id" value={id} />
@@ -129,7 +130,7 @@ function Mover({ action, id, courseId, moduleId }: { action: (fd: FormData) => P
           <input type="hidden" name="course_id" value={courseId} />
           {moduleId && <input type="hidden" name="module_id" value={moduleId} />}
           <input type="hidden" name="dir" value={d} />
-          <button className="b2" type="submit">{d === 'up' ? 'Subir' : 'Descer'}</button>
+          <SubmitButton className="b2">{d === 'up' ? 'Subir' : 'Descer'}</SubmitButton>
         </form>
       ))}
     </span>

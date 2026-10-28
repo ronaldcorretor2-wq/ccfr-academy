@@ -65,3 +65,21 @@ progress{width:100%;height:6px}
 .tabs{display:flex;gap:4px;background:var(--soft);padding:4px;border-radius:10px}
 .tabs a{flex:1;text-align:center;padding:9px;border-radius:8px;text-decoration:none;color:var(--mut)}
 .tabs a.on{background:var(--card);color:var(--tx);font-weight:600}
+/* Resposta visual ao clique */
+.btn,.b2,.sb a,a.pn,.tabs a{transition:transform .08s ease,background-color .15s ease,border-color .15s ease,opacity .15s ease}
+.btn:hover{opacity:.92}
+.btn:active:not(:disabled){transform:translateY(1px) scale(.97);opacity:.75}
+.b2:hover{background:var(--hov)}
+.b2:active:not(:disabled){transform:translateY(1px) scale(.97);background:var(--bar);border-color:var(--mut)}
+.b2:disabled{opacity:.6;cursor:wait}
+.btn[aria-busy="true"]{cursor:wait}
+.sb a:active{transform:scale(.97);background:var(--bar)}
+a.pn:hover{border-color:var(--mut)}
+a.pn:active{transform:scale(.985)}
+.tabs a:active{transform:scale(.97)}
+.spin{display:inline-block;width:14px;height:14px;margin-right:8px;vertical-align:-2px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:giro .7s linear infinite}
+@keyframes giro{to{transform:rotate(360deg)}}
+.navbar{position:fixed;top:0;left:0;height:3px;width:0;background:#B8924A;z-index:50;animation:andamento 1.6s cubic-bezier(.1,.7,.2,1) forwards}
+@keyframes andamento{to{width:88%}}
+.skel{background:var(--card);border:1px solid var(--line);border-radius:12px;animation:pulso 1.2s ease-in-out infinite}
+@keyframes pulso{50%{opacity:.5}}

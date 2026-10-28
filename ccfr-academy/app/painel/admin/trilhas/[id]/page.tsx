@@ -1,3 +1,4 @@
+import SubmitButton from '@/components/SubmitButton';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { requireStaff } from '@/lib/ctx';
@@ -31,7 +32,7 @@ export default async function EditarTrilha({ params, searchParams }: { params: {
         <input type="hidden" name="id" value={id} />
         <label>Título<input className="in" name="title" defaultValue={path.title} required /></label>
         <label>Descrição<textarea className="in" name="description" defaultValue={path.description} /></label>
-        <button className="btn" type="submit">Salvar</button>
+        <SubmitButton className="btn">Salvar</SubmitButton>
       </form>
       <section className="pn">
         <h2>Cursos da trilha, em ordem</h2>
@@ -42,7 +43,7 @@ export default async function EditarTrilha({ params, searchParams }: { params: {
             {(['up', 'down'] as const).map((d) => (
               <form key={d} action={movePathCourse}>
                 <input type="hidden" name="id" value={r.id} /><input type="hidden" name="path_id" value={id} /><input type="hidden" name="dir" value={d} />
-                <button className="b2" type="submit">{d === 'up' ? 'Subir' : 'Descer'}</button>
+                <SubmitButton className="b2">{d === 'up' ? 'Subir' : 'Descer'}</SubmitButton>
               </form>
             ))}
             <form action={removePathCourse}>
@@ -58,7 +59,7 @@ export default async function EditarTrilha({ params, searchParams }: { params: {
             <label style={{ flex: 1 }}>Adicionar curso
               <select className="in" name="course_id">{free.map((c) => <option key={c.id} value={c.id}>{c.title}</option>)}</select>
             </label>
-            <button className="btn" type="submit" style={{ alignSelf: 'flex-end' }}>Adicionar</button>
+            <SubmitButton className="btn" style={{ alignSelf: 'flex-end' }}>Adicionar</SubmitButton>
           </form>
         )}
       </section>
@@ -67,7 +68,7 @@ export default async function EditarTrilha({ params, searchParams }: { params: {
         <div className="row">
           <form action={setPathStatus}>
             <input type="hidden" name="id" value={id} /><input type="hidden" name="status" value={published ? 'draft' : 'published'} />
-            <button className="btn" type="submit">{published ? 'Voltar para rascunho' : 'Publicar trilha'}</button>
+            <SubmitButton className="btn">{published ? 'Voltar para rascunho' : 'Publicar trilha'}</SubmitButton>
           </form>
           <form action={deletePath}>
             <input type="hidden" name="id" value={id} />

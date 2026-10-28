@@ -1,3 +1,4 @@
+import SubmitButton from '@/components/SubmitButton';
 import Link from 'next/link';
 import { requireStaff } from '@/lib/ctx';
 import { createCourse } from '../actions';
@@ -16,7 +17,7 @@ export default async function Admin({ searchParams }: { searchParams: { erro?: s
       <form className="pn" action={createCourse}>
         <h2>Novo curso</h2>
         <label>Título do curso<input className="in" name="title" required minLength={2} /></label>
-        <button className="btn" type="submit">Criar curso</button>
+        <SubmitButton className="btn">Criar curso</SubmitButton>
       </form>
       <section className="pn">
         <h2>Cursos da igreja</h2>

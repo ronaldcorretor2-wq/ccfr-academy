@@ -1,3 +1,4 @@
+import SubmitButton from '@/components/SubmitButton';
 import { requirePlatform } from '@/lib/ctx';
 import { createOrg, masterSetAdmin, masterUpdateOrg } from '../actions';
 
@@ -18,7 +19,7 @@ export default async function Mestre({ searchParams }: { searchParams: { erro?: 
         <label>Nome da igreja<input className="in" name="name" required minLength={2} /></label>
         <label>Endereço curto (letras minúsculas, números e hífen)<input className="in" name="slug" required pattern="[a-z0-9\-]{3,40}" /></label>
         <label>E-mail do administrador (ele precisa já ter criado a conta)<input className="in" name="email" type="email" required /></label>
-        <button className="btn" type="submit">Cadastrar igreja</button>
+        <SubmitButton className="btn">Cadastrar igreja</SubmitButton>
       </form>
       {orgs.map((o) => (
         <section className="pn" key={o.id}>
@@ -28,12 +29,12 @@ export default async function Mestre({ searchParams }: { searchParams: { erro?: 
             <input type="hidden" name="org_id" value={o.id} />
             <label>Plano<input className="in" name="plan" defaultValue={o.plan} /></label>
             <label>Limite de alunos<input className="in" name="max" type="number" min={0} defaultValue={o.max_students} /></label>
-            <button className="b2" type="submit" style={{ alignSelf: 'flex-end' }}>Salvar plano</button>
+            <SubmitButton className="b2" style={{ alignSelf: 'flex-end' }}>Salvar plano</SubmitButton>
           </form>
           <form className="row" action={masterSetAdmin}>
             <input type="hidden" name="org_id" value={o.id} />
             <label style={{ flex: 1 }}>Adicionar administrador por e-mail<input className="in" name="email" type="email" required /></label>
-            <button className="b2" type="submit" style={{ alignSelf: 'flex-end' }}>Adicionar</button>
+            <SubmitButton className="b2" style={{ alignSelf: 'flex-end' }}>Adicionar</SubmitButton>
           </form>
         </section>
       ))}

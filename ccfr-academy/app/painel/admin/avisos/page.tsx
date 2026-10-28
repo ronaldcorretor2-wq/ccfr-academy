@@ -1,3 +1,4 @@
+import SubmitButton from '@/components/SubmitButton';
 import Link from 'next/link';
 import { requireStaff } from '@/lib/ctx';
 import ConfirmButton from '@/components/ConfirmButton';
@@ -20,7 +21,7 @@ export default async function Avisos({ searchParams }: { searchParams: { erro?: 
         <h2>Novo aviso</h2>
         <label>Título<input className="in" name="title" required maxLength={160} /></label>
         <label>Texto (opcional)<textarea className="in" name="body" maxLength={2000} /></label>
-        <button className="btn" type="submit">Publicar aviso</button>
+        <SubmitButton className="btn">Publicar aviso</SubmitButton>
       </form>
       <section className="pn">
         <h2>Avisos publicados</h2>

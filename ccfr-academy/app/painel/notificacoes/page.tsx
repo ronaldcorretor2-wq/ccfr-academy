@@ -1,3 +1,4 @@
+import SubmitButton from '@/components/SubmitButton';
 import Link from 'next/link';
 import { getCtx } from '@/lib/ctx';
 import { markAllRead, markRead } from '../actions';
@@ -14,7 +15,7 @@ export default async function Notificacoes() {
           <h1>Notificações</h1>
           <p className="m">{unread ? `${unread} não lida${unread > 1 ? 's' : ''}` : 'Tudo em dia.'}</p>
         </div>
-        {unread > 0 && <form action={markAllRead}><button className="b2" type="submit">Marcar todas como lidas</button></form>}
+        {unread > 0 && <form action={markAllRead}><SubmitButton className="b2">Marcar todas como lidas</SubmitButton></form>}
       </div>
       <section className="pn">
         {items.map((n) => (
@@ -26,7 +27,7 @@ export default async function Notificacoes() {
               {typeof n.link === 'string' && n.link.startsWith('/') && <Link className="m" href={n.link}>Abrir</Link>}
             </div>
             {!n.read_at && (
-              <form action={markRead}><input type="hidden" name="id" value={n.id} /><button className="b2" type="submit">Marcar como lida</button></form>
+              <form action={markRead}><input type="hidden" name="id" value={n.id} /><SubmitButton className="b2">Marcar como lida</SubmitButton></form>
             )}
           </div>
         ))}

@@ -1,5 +1,6 @@
 import './globals.css';
 import type { ReactNode } from 'react';
+import NavProgress from '@/components/NavProgress';
 
 export const metadata = { title: 'CCFR Academy', description: 'Plataforma de formação cristã' };
 
@@ -14,7 +15,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@500;600;700&family=Hanken+Grotesk:wght@400;500;700&display=swap" />
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
-      <body>{children}</body>
+      <body>
+        <NavProgress />
+        {children}
+      </body>
     </html>
   );
 }

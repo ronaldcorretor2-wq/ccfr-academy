@@ -1,3 +1,4 @@
+import SubmitButton from '@/components/SubmitButton';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { requireStaff } from '@/lib/ctx';
@@ -23,7 +24,7 @@ export default async function Configuracoes({ searchParams }: { searchParams: { 
       <form className="pn" action={updateOrgName}>
         <h2>Nome</h2>
         <label>Nome da igreja<input className="in" name="name" defaultValue={member.orgName} required minLength={2} /></label>
-        <button className="btn" type="submit">Salvar nome</button>
+        <SubmitButton className="btn">Salvar nome</SubmitButton>
       </form>
       <section className="pn">
         <h2>Catálogo público</h2>
@@ -31,7 +32,7 @@ export default async function Configuracoes({ searchParams }: { searchParams: { 
         {pub && <p className="m">Endereço público: {siteOrigin()}/c/{org?.slug}</p>}
         <form action={togglePublicCatalog}>
           <input type="hidden" name="value" value={pub ? 'off' : 'on'} />
-          <button className="btn" type="submit">{pub ? 'Desligar catálogo público' : 'Ligar catálogo público'}</button>
+          <SubmitButton className="btn">{pub ? 'Desligar catálogo público' : 'Ligar catálogo público'}</SubmitButton>
         </form>
       </section>
       {member.logoPath && (

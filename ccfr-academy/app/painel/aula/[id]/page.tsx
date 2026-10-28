@@ -1,3 +1,4 @@
+import SubmitButton from '@/components/SubmitButton';
 import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 import { getCtx } from '@/lib/ctx';
@@ -92,7 +93,7 @@ export default async function Aula({ params, searchParams }: { params: { id: str
               ))}
             </fieldset>
           ))}
-          <button className="btn" type="submit">Enviar respostas</button>
+          <SubmitButton className="btn">Enviar respostas</SubmitButton>
           {attempts.length > 0 && (
             <div>
               <h3>Suas tentativas</h3>
@@ -125,7 +126,7 @@ export default async function Aula({ params, searchParams }: { params: { id: str
         <input type="hidden" name="lesson_id" value={lesson.id} />
         <h2>Minhas anotações</h2>
         <textarea className="in" name="content" defaultValue={nt?.content ?? ''} maxLength={5000} aria-label="Minhas anotações desta aula" />
-        <button className="b2" type="submit" style={{ alignSelf: 'flex-start' }}>Salvar anotações</button>
+        <SubmitButton className="b2" style={{ alignSelf: 'flex-start' }}>Salvar anotações</SubmitButton>
       </form>
 
       <div className="row">
@@ -133,7 +134,7 @@ export default async function Aula({ params, searchParams }: { params: { id: str
         {done.has(lesson.id) ? (
           <span className="tag">Aula concluída</span>
         ) : canComplete ? (
-          <form action={completeLesson}><input type="hidden" name="lesson_id" value={lesson.id} /><button className="btn" type="submit">Concluir aula</button></form>
+          <form action={completeLesson}><input type="hidden" name="lesson_id" value={lesson.id} /><SubmitButton className="btn">Concluir aula</SubmitButton></form>
         ) : (
           <span className="m">Aprove na avaliação para concluir esta aula.</span>
         )}

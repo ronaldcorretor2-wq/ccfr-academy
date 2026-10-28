@@ -1,3 +1,4 @@
+import SubmitButton from '@/components/SubmitButton';
 import Link from 'next/link';
 import { requireStaff } from '@/lib/ctx';
 import { createPath } from '../../actions';
@@ -17,7 +18,7 @@ export default async function AdminTrilhas({ searchParams }: { searchParams: { e
       <form className="pn" action={createPath}>
         <h2>Nova trilha</h2>
         <label>Título da trilha<input className="in" name="title" required minLength={2} /></label>
-        <button className="btn" type="submit">Criar trilha</button>
+        <SubmitButton className="btn">Criar trilha</SubmitButton>
       </form>
       <section className="pn">
         <h2>Trilhas da igreja</h2>

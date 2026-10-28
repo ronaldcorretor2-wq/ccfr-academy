@@ -1,3 +1,4 @@
+import SubmitButton from '@/components/SubmitButton';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 import { publicLogo } from '@/lib/logo';
@@ -40,13 +41,13 @@ export default async function Login({ searchParams }: { searchParams: SP }) {
           ) : (
             <label>Endereço da sua igreja (peça à sua igreja)<input className="in" name="church_slug" placeholder="ex.: ccfr" /></label>
           )}
-          <button className="btn" type="submit">Criar conta</button>
+          <SubmitButton className="btn">Criar conta</SubmitButton>
         </form>
       ) : (
         <form className="pn" action={signIn}>
           <label>E-mail<input className="in" name="email" type="email" required autoComplete="email" /></label>
           <label>Senha<input className="in" name="password" type="password" required autoComplete="current-password" /></label>
-          <button className="btn" type="submit">Entrar</button>
+          <SubmitButton className="btn">Entrar</SubmitButton>
           <Link className="m" href="/recuperar">Esqueci minha senha</Link>
         </form>
       )}

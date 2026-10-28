@@ -1,3 +1,4 @@
+import SubmitButton from '@/components/SubmitButton';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import CourseCover from '@/components/CourseCover';
@@ -27,7 +28,7 @@ export default async function Painel({ searchParams }: { searchParams: { erro?: 
         <form className="pn" action={joinOrg}>
           <h2>Entrar numa igreja</h2>
           <label>Endereço da igreja (ex.: ccfr)<input className="in" name="slug" required /></label>
-          <button className="btn" type="submit">Entrar na igreja</button>
+          <SubmitButton className="btn">Entrar na igreja</SubmitButton>
         </form>
       </>
     );

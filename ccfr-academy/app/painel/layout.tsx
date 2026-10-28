@@ -1,3 +1,4 @@
+import SubmitButton from '@/components/SubmitButton';
 import type { ReactNode } from 'react';
 import { getCtx } from '@/lib/ctx';
 import NavItem from '@/components/NavItem';
@@ -34,7 +35,7 @@ export default async function PainelLayout({ children }: { children: ReactNode }
         {pa === true && <NavItem href="/painel/mestre" d={I.master}>Painel mestre</NavItem>}
         <div className="sbfoot">
           <ThemeToggle />
-          <form action={signOut}><button className="b2" type="submit">Sair</button></form>
+          <form action={signOut}><SubmitButton className="b2">Sair</SubmitButton></form>
         </div>
       </nav>
       <main className="mn">{children}</main>
