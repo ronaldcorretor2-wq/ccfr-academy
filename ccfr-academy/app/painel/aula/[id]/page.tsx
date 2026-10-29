@@ -134,7 +134,7 @@ export default async function Aula({ params, searchParams }: { params: { id: str
         {done.has(lesson.id) ? (
           <span className="tag">Aula concluída</span>
         ) : canComplete ? (
-          <form action={completeLesson}><input type="hidden" name="lesson_id" value={lesson.id} /><SubmitButton className="btn">Concluir aula</SubmitButton></form>
+          <form action={completeLesson}><input type="hidden" name="lesson_id" value={lesson.id} /><SubmitButton className="btn coral">Concluir aula</SubmitButton></form>
         ) : (
           <span className="m">Aprove na avaliação para concluir esta aula.</span>
         )}

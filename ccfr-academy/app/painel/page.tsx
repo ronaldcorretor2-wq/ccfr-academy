@@ -65,10 +65,10 @@ export default async function Painel({ searchParams }: { searchParams: { erro?: 
         <section className="hero">
           <div className="txt">
             <span className="tag" style={{ alignSelf: 'flex-start' }}>Continue de onde parou</span>
-            <h2 style={{ fontSize: 28, margin: 0 }}>{continueTitle}</h2>
+            <h2>{continueTitle}</h2>
             <Link className="btn" href={`/painel/aula/${continueId}`}>Continuar aula</Link>
           </div>
-          <div className="art">{startCourse && <CourseCover id={startCourse} h={240} src={covers[startCourse]} />}</div>
+          <div className="art">{/* eslint-disable-next-line @next/next/no-img-element */}<img className="heroimg" src={(startCourse && covers[startCourse]) || '/brand/foto-hero.jpg'} alt="" /></div>
         </section>
       )}
       {notices.length > 0 && (
@@ -90,9 +90,9 @@ export default async function Painel({ searchParams }: { searchParams: { erro?: 
         <div className="g">
           {ordered.map((c) => (
             <Link key={c.id} href={`/painel/cursos/${c.id}`} className="pn" style={{ textDecoration: 'none' }}>
-              <CourseCover id={c.id} h={110} src={covers[c.id]} />
+              <CourseCover id={c.id} title={c.title} h={120} src={covers[c.id]} />
               <h3>{c.title}</h3>
-              {favs.has(c.id) && <span className="tag" style={{ alignSelf: 'flex-start' }}>Favorito</span>}
+              {favs.has(c.id) && <span className="tag y" style={{ alignSelf: 'flex-start' }}>Favorito</span>}
               {c.status !== 'published' && <span className="tag" style={{ alignSelf: 'flex-start' }}>Rascunho (só equipe vê)</span>}
               <p className="m">{c.description}</p>
               <div className="bar"><i style={{ width: `${pct(c.id)}%` }} /></div>

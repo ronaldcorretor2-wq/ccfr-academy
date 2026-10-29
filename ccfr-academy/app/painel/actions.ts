@@ -138,12 +138,12 @@ export async function addLesson(fd: FormData) {
   const courseId = txt(fd, 'course_id');
   const moduleId = txt(fd, 'module_id');
   const { count } = await supabase.from('lessons').select('id', { count: 'exact', head: true }).eq('module_id', moduleId);
-  const { error } = await supabase.from('lessons').insert({
+  const { data: created, error } = await supabase.from('lessons').insert({
     org_id: member.orgId, course_id: courseId, module_id: moduleId, title: txt(fd, 'title'),
     video_url: txt(fd, 'video_url') || null, content: txt(fd, 'content'), position: (count ?? 0) + 1,
-  });
-  if (error) back(`/painel/admin/cursos/${courseId}`, 'erro', 'Não foi possível adicionar a aula.');
-  redirect(`/painel/admin/cursos/${courseId}`);
+  }).select('id').single();
+  if (error || !created) back(`/painel/admin/cursos/${courseId}`, 'erro', 'Não foi possível adicionar a aula.');
+  redirect(`/painel/admin/aulas/${created!.id}`);
 }
 
 export async function deleteLesson(fd: FormData) {

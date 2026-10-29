@@ -27,14 +27,14 @@ export default async function Curso({ params, searchParams }: { params: { id: st
         <h1>{course.title}</h1>
         <p className="m">{course.description}</p>
       </div>
-      <CourseCover id={params.id} h={170} src={covers[params.id]} />
+      <CourseCover id={params.id} title={course.title} h={180} src={covers[params.id]} />
       {searchParams.erro && <div className="erro" role="alert">{searchParams.erro}</div>}
       {lock && <div className="erro" role="status">Este curso faz parte de uma trilha. Conclua antes: {lock}.</div>}
       <div className="row">
         {first && !lock && (enr || !member ? (
-          <Link className="btn" href={`/painel/aula/${first.id}`}>{lessons.some((l) => done.has(l.id)) ? 'Continuar curso' : 'Começar curso'}</Link>
+          <Link className="btn coral" href={`/painel/aula/${first.id}`}>{lessons.some((l) => done.has(l.id)) ? 'Continuar curso' : 'Começar curso'}</Link>
         ) : (
-          <form action={enroll}><input type="hidden" name="course_id" value={params.id} /><SubmitButton className="btn">Matricular-se</SubmitButton></form>
+          <form action={enroll}><input type="hidden" name="course_id" value={params.id} /><SubmitButton className="btn coral">Matricular-se</SubmitButton></form>
         ))}
         {member && (
           <form action={toggleFavorite}>

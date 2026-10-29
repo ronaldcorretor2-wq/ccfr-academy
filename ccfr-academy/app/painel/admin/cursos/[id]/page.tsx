@@ -49,7 +49,7 @@ export default async function CursoAdmin({ params, searchParams }: { params: { i
         <SubmitButton className="btn">Salvar alterações</SubmitButton>
       </form>
 
-      <CourseCover id={id} h={160} src={covers[id]} />
+      <CourseCover id={id} title={course.title} h={160} src={covers[id]} />
       <UploadCover courseId={id} orgId={member.orgId} save={saveCover} />
 
       <section className="pn">
@@ -68,7 +68,7 @@ export default async function CursoAdmin({ params, searchParams }: { params: { i
               <div className="li" key={x.id}>
                 <span style={{ flex: 1 }}>{x.title}</span>
                 <Mover action={moveLesson} id={x.id} courseId={id} moduleId={mod.id} />
-                <Link className="b2" href={`/painel/admin/aulas/${x.id}`}>Editar</Link>
+                <Link className="b2" href={`/painel/admin/aulas/${x.id}`}>Editar e anexar PDF</Link>
                 <form action={deleteLesson}>
                   <input type="hidden" name="id" value={x.id} /><input type="hidden" name="course_id" value={id} />
                   <ConfirmButton message="Excluir esta aula?">Excluir</ConfirmButton>
@@ -78,6 +78,7 @@ export default async function CursoAdmin({ params, searchParams }: { params: { i
             <form className="pn" action={addLesson}>
               <input type="hidden" name="course_id" value={id} /><input type="hidden" name="module_id" value={mod.id} />
               <h3>Nova aula neste módulo</h3>
+              <p className="m">Ao adicionar, você vai direto para a tela onde pode anexar PDF e áudio.</p>
               <label>Título da aula<input className="in" name="title" required /></label>
               <label>Link do vídeo (YouTube, opcional)<input className="in" name="video_url" type="url" placeholder="https://www.youtube.com/watch?v=..." /></label>
               <label>Texto da aula (opcional)<textarea className="in" name="content" /></label>

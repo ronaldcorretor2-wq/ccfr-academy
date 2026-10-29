@@ -37,3 +37,10 @@ GitHub recebe o código; o Netlify publica sozinho a cada envio. Se o repositór
 
 ## Ainda não existe
 subdomínios e domínios próprios por igreja, notificações por e-mail, questões abertas e de resposta múltipla, relatórios aluno a aluno exportáveis, histórico de uso de armazenamento.
+
+## Identidade visual (brandbook Família e Reino, Coco Design 2026)
+- **Arquivos da marca:** `public/brand` (logotipos em preto e off-white, símbolo, padrão verde e a foto padrão do destaque do painel, `foto-hero.jpg`). Para trocar a foto do destaque, substitua esse arquivo.
+- **Cores:** definidas no início de `app/globals.css` (preto, off-white `#F7FAF7`, coral, amarelo, roxo, verde e pêssego). Tema claro por padrão, com botão para o escuro.
+- **Fonte:** a marca usa a Franie; o site usa Poppins (parecida). Para trocar, altere o `<link>` em `app/layout.tsx` e a `font-family` em `app/globals.css` quando houver licença web da Franie.
+- **Capas dos cursos:** com foto enviada, aparece a foto; sem foto, aparece um bloco de cor da marca com o título na vertical.
+- **Logotipo da igreja:** sem logotipo enviado, o site usa o logotipo da CCFR. Outras igrejas devem enviar o próprio em Administração > Configurações da igreja (no menu escuro ele é exibido em branco automaticamente).

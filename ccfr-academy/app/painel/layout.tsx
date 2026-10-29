@@ -24,8 +24,9 @@ export default async function PainelLayout({ children }: { children: ReactNode }
     <div className="shell">
       <nav className="sb" aria-label="Principal">
         <div className="lg">
-          {logo ? <img className="lgimg" src={logo} alt="" /> : <i>CCFR</i>}
-          <div><b>Academy</b><span>{member?.orgName ?? ''}</span></div>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img className={logo ? 'lgfull lginv' : 'lgfull'} src={logo ?? '/brand/lock_w.png'} alt="CCFR" />
+          <span>Academy · {member?.orgName ?? ''}</span>
         </div>
         <NavItem href="/painel" d={I.home} exact>Início</NavItem>
         <NavItem href="/painel/trilhas" d={I.paths}>Trilhas</NavItem>

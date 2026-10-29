@@ -11,7 +11,8 @@ export default async function CatalogoPublico({ params }: { params: { slug: stri
   return (
     <div className="mn" style={{ margin: '0 auto' }}>
       <div>
-        <p className="m">CCFR Academy</p>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img className="blogo" src="/brand/lock_k.png" alt="CCFR" style={{ height: 30, width: 'auto', marginBottom: 20 }} />
         <h1>{c.name}</h1>
         <p className="m">Cursos de formação disponíveis. Para estudar, crie sua conta ou entre.</p>
       </div>
@@ -21,7 +22,7 @@ export default async function CatalogoPublico({ params }: { params: { slug: stri
       <div className="g">
         {courses.map((x) => (
           <article key={x.id} className="pn">
-            <CourseCover id={x.id} h={110} />
+            <CourseCover id={x.id} title={x.title} h={120} />
             <h3>{x.title}</h3>
             <p className="m">{x.description}</p>
           </article>

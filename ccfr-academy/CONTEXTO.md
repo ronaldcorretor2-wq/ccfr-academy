@@ -14,3 +14,4 @@
 - Foto de capa por curso (migração 010, enviada pela equipe; sem foto usa o padrão geométrico). Pendente: subdomínios/domínios próprios, notificações por e-mail.
 - Tela de login com abas (Entrar/Criar conta) e identidade da igreja; logotipo em pasta pública logos (migração 011); variável opcional IGREJA_PADRAO.
 - Resposta visual ao clique: botão com estado "Aguarde..." e giro (SubmitButton/ConfirmButton), efeito de pressionar em botões, menu e cartões, barra no topo ao navegar (NavProgress) e tela de carregamento (app/painel/loading.tsx).
+- Identidade do brandbook aplicada: Poppins no lugar da Franie (trocar quando houver licença), paleta preto/off-white com coral, amarelo, roxo, verde e pêssego, menu preto com logotipo, entrada com padrão verde, capas em bloco de cor, certificado com faixa roxa, tema claro por padrão com opção escura. Arquivos da marca em public/brand.
