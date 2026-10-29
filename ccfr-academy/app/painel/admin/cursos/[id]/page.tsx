@@ -41,6 +41,8 @@ export default async function CursoAdmin({ params, searchParams }: { params: { i
       {searchParams.erro && <div className="erro" role="alert">{searchParams.erro}</div>}
       {searchParams.ok && <div className="ok" role="status">{searchParams.ok}</div>}
 
+      <div className="adm">
+        <div>
       <form className="pn" action={updateCourse}>
         <input type="hidden" name="id" value={id} />
         <h2>Dados do curso</h2>
@@ -48,9 +50,6 @@ export default async function CursoAdmin({ params, searchParams }: { params: { i
         <label>Descrição<textarea className="in" name="description" defaultValue={course.description} /></label>
         <SubmitButton className="btn">Salvar alterações</SubmitButton>
       </form>
-
-      <CourseCover id={id} title={course.title} h={160} src={covers[id]} />
-      <UploadCover courseId={id} orgId={member.orgId} save={saveCover} />
 
       <section className="pn">
         <h2>Módulos e aulas</h2>
@@ -81,6 +80,66 @@ export default async function CursoAdmin({ params, searchParams }: { params: { i
               <p className="m">Ao adicionar, você vai direto para a tela onde pode anexar PDF e áudio.</p>
               <label>Título da aula<input className="in" name="title" required /></label>
               <label>Link do vídeo (YouTube, opcional)<input className="in" name="video_url" type="url" placeholder="https://www.youtube.com/watch?v=..." /></label>
+              <label>Texto da aula (opcional)<textarea className="in" name="content" /></label>
+              <SubmitButton className="btn">Adicionar aula</SubmitButton>
+            </form>
+          </div>
+        ))}
+        <form className="row" action={addModule}>
+          <input type="hidden" name="course_id" value={id} />
+          <label style={{ flex: 1 }}>Novo módulo<input className="in" name="title" required placeholder="Ex.: Módulo 1: Quem é Deus" /></label>
+          <SubmitButton className="btn" style={{ alignSelf: 'flex-end' }}>Adicionar módulo</SubmitButton>
+        </form>
+      </section>
+
+        </div>
+        <div>
+      <section className="pn">
+        <h2 style={{ marginBottom: 0 }}>Antes de publicar</h2>
+        <p className="m">Revise para não publicar um curso incompleto.</p>
+        {[
+          ['Título e descrição', !!course.title && !!String(course.description ?? '').trim(), 'Obrigatório'],
+          ['Pelo menos uma aula', lessons.length > 0, 'Obrigatório'],
+          ['Imagem de capa', !!course.cover_path, 'Recomendado'],
+        ].map(([label, ok, kind]) => (
+          <div className="chk" key={String(label)}>
+            <b className={ok ? 'ok' : ''} aria-hidden="true">{ok ? <svg width="12" height="12" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="2.4"><path d="M2 9l5 5 9-10" /></svg> : null}</b>
+            <span style={{ fontWeight: ok ? 500 : 400 }}>{String(label)}</span>
+            <em>{ok ? 'Pronto' : String(kind)}</em>
+          </div>
+        ))}
+      </section>
+      <CourseCover id={id} title={course.title} h={170} src={covers[id]} />
+      <UploadCover courseId={id} orgId={member.orgId} save={saveCover} />
+
+      <section className="pn">
+        <h2>Publicação</h2>
+        <p className="m">Para publicar, o curso precisa de título, descrição e pelo menos uma aula.</p>
+        <div className="row">
+          <form action={setStatus}>
+            <input type="hidden" name="id" value={id} /><input type="hidden" name="status" value={published ? 'draft' : 'published'} />
+            <SubmitButton className="btn">{published ? 'Voltar para rascunho' : 'Publicar curso'}</SubmitButton>
+          </form>
+          <form action={deleteCourse}>
+            <input type="hidden" name="id" value={id} />
+            <ConfirmButton message="Excluir este curso, seus módulos, aulas e o progresso dos alunos? Não dá para desfazer.">Excluir curso</ConfirmButton>
+          </form>
+        </div>
+      </section>
+
+      <section className="pn">
+        <h2>Progresso dos alunos</h2>
+        {enrolled.map((x) => (
+          <div className="li" key={x.user_id}>
+            <span>{nameOf(x)}</span>
+            <span className="m">{doneBy[x.user_id] ?? 0} de {lessons.length} aulas concluídas</span>
+          </div>
+        ))}
+        {!enrolled.length && <p className="m">Nenhum aluno matriculado ainda.</p>}
+      </section>
+        </div>
+      </div>
+  <label>Link do vídeo (YouTube, opcional)<input className="in" name="video_url" type="url" placeholder="https://www.youtube.com/watch?v=..." /></label>
               <label>Texto da aula (opcional)<textarea className="in" name="content" /></label>
               <SubmitButton className="btn">Adicionar aula</SubmitButton>
             </form>
