@@ -139,44 +139,6 @@ export default async function CursoAdmin({ params, searchParams }: { params: { i
       </section>
         </div>
       </div>
-  <label>Link do vídeo (YouTube, opcional)<input className="in" name="video_url" type="url" placeholder="https://www.youtube.com/watch?v=..." /></label>
-              <label>Texto da aula (opcional)<textarea className="in" name="content" /></label>
-              <SubmitButton className="btn">Adicionar aula</SubmitButton>
-            </form>
-          </div>
-        ))}
-        <form className="row" action={addModule}>
-          <input type="hidden" name="course_id" value={id} />
-          <label style={{ flex: 1 }}>Novo módulo<input className="in" name="title" required placeholder="Ex.: Módulo 1: Quem é Deus" /></label>
-          <SubmitButton className="btn" style={{ alignSelf: 'flex-end' }}>Adicionar módulo</SubmitButton>
-        </form>
-      </section>
-
-      <section className="pn">
-        <h2>Publicação</h2>
-        <p className="m">Para publicar, o curso precisa de título, descrição e pelo menos uma aula.</p>
-        <div className="row">
-          <form action={setStatus}>
-            <input type="hidden" name="id" value={id} /><input type="hidden" name="status" value={published ? 'draft' : 'published'} />
-            <SubmitButton className="btn">{published ? 'Voltar para rascunho' : 'Publicar curso'}</SubmitButton>
-          </form>
-          <form action={deleteCourse}>
-            <input type="hidden" name="id" value={id} />
-            <ConfirmButton message="Excluir este curso, seus módulos, aulas e o progresso dos alunos? Não dá para desfazer.">Excluir curso</ConfirmButton>
-          </form>
-        </div>
-      </section>
-
-      <section className="pn">
-        <h2>Progresso dos alunos</h2>
-        {enrolled.map((x) => (
-          <div className="li" key={x.user_id}>
-            <span>{nameOf(x)}</span>
-            <span className="m">{doneBy[x.user_id] ?? 0} de {lessons.length} aulas concluídas</span>
-          </div>
-        ))}
-        {!enrolled.length && <p className="m">Nenhum aluno matriculado ainda.</p>}
-      </section>
     </>
   );
 }
